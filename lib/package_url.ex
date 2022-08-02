@@ -3,7 +3,9 @@ defmodule PackageUrl do
   Documentation for `PackageUrl`.
   """
 
-  defstruct scheme: "pkg",
+  import Kernel, except: [to_string: 1]
+
+  defstruct scheme: nil,
             type: nil,
             namespace: nil,
             name: nil,
@@ -12,374 +14,331 @@ defmodule PackageUrl do
             subpath: nil,
             remainder: nil
 
-  def new!(purl) do
-    case new(purl) do
-      {:ok, purl} -> purl
-      {:error, reason} -> raise reason
+  def new(nil), do: nil
+
+  def new(purl) when is_binary(purl), do: parse_purl(purl)
+
+  def new(options) when is_list(options) do
+    options
+    |> Enum.into(%{})
+    |> new()
+  end
+
+  def new(map) when is_map(map) do
+    merged = %__MODULE__{} |> Map.from_struct() |> Map.merge(map)
+
+    with {:ok, options} <-
+           {:ok, merged}
+           |> sanitize_type()
+           |> sanitize_name()
+           |> sanitize_namespace()
+           |> sanitize_version()
+           |> sanitize_qualifiers()
+           |> sanitize_subpath() do
+      {:ok, struct(__MODULE__, options)}
+    else
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  # TODO Remove
-  def new(nil), do: {:error, "No PackageURL provided"}
-
-  def new(purl) when is_binary(purl) do
-    parse_purl(purl)
+  def new!(purl) do
+    case new(purl) do
+      {:ok, purl} -> purl
+      {:error, reason} -> raise(ArgumentError, reason)
+    end
   end
 
-  def new(options) when is_list(options), do: {:ok, PackageUrl.__struct__(options)}
+  def to_string(%__MODULE__{} = purl), do: build_purl(purl)
 
-  def canonical_url(purl) do
-    with {:ok, acc} <- build_scheme(purl, ""),
+  def to_string!(%__MODULE__{} = purl) do
+    case to_string(purl) do
+      {:ok, purl} -> purl
+      {:error, reason} -> raise(ArgumentError, reason)
+    end
+  end
+
+  ################################################################
+  # Private Functions
+  ################################################################
+
+  ################################################################
+  # Parsing functions
+  ################################################################
+  def parse_purl(nil), do: {:error, "A purl string argument is required."}
+  def parse_purl(""), do: {:error, "A purl string argument is required."}
+
+  def parse_purl(purl) do
+    with {:ok, scheme, remainder} <- parse_scheme(purl),
+         {:ok, type, _remainder} <- parse_type(remainder),
+         url <- URI.parse(purl),
+         {:ok, qualifiers} <- parse_qualifiers(url),
+         {:ok, subpath} <- parse_subpath(url),
+         :ok <- reject_userinfo(url),
+         path <- trim_leading_slashes(url.path),
+         {:ok, version, remainder} <- parse_version(path),
+         {:ok, namespace, name} <- parse_namespace_name(remainder) do
+      new(
+        scheme: scheme,
+        type: type,
+        qualifiers: qualifiers,
+        subpath: subpath,
+        version: version,
+        namespace: namespace,
+        name: name
+      )
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp parse_scheme(purl) do
+    case String.split(purl, ":", parts: 2) do
+      ["pkg"] -> {:ok, "pkg", ""}
+      ["pkg", remainder] -> {:ok, "pkg", trim_leading_slashes(remainder)}
+      _ -> {:error, "purl is missing the required \"pkg\" scheme component."}
+    end
+  end
+
+  defp parse_type(remainder) do
+    case String.split(remainder, "/", parts: 2) do
+      [_] -> {:error, "purl is missing the required \"type\" component"}
+      [_, ""] -> {:error, "purl is missing the required \"type\" component"}
+      [type, remainder] -> {:ok, type, remainder}
+    end
+  end
+
+  defp parse_qualifiers(url) do
+    case url.query do
+      nil -> {:ok, nil}
+      query -> {:ok, URI.decode_query(query)}
+    end
+  end
+
+  defp parse_subpath(url), do: {:ok, url.fragment}
+
+  defp reject_userinfo(%URI{userinfo: nil}), do: :ok
+  defp reject_userinfo(_), do: {:error, "Invalid purl: cannot contain a \"user:pass@host:port\""}
+
+  defp parse_version(path) do
+    case String.split(path, "@", parts: 2) do
+      [remainder] -> {:ok, nil, remainder}
+      [remainder, version] -> {:ok, decodeURIComponent(version), remainder}
+    end
+  end
+
+  defp parse_namespace_name(remainder) do
+    case remainder |> String.split("/") |> Enum.drop(1) |> Enum.reverse() do
+      [""] ->
+        {:ok, nil, nil}
+
+      [name] ->
+        {:ok, nil, decodeURIComponent(name)}
+
+      ["" | namespace] ->
+        {:ok, namespace |> Enum.reverse() |> Enum.join("/") |> decodeURIComponent(), nil}
+
+      [name | namespace] ->
+        {:ok, namespace |> Enum.reverse() |> Enum.join("/") |> decodeURIComponent(),
+         decodeURIComponent(name)}
+    end
+  end
+
+  ################################################################
+  # Sanitizing functions
+  ################################################################
+
+  defp sanitize_type({:error, _} = error), do: error
+
+  defp sanitize_type({:ok, %{type: nil}}),
+    do: {:error, "Invalid purl: :type is a required field."}
+
+  defp sanitize_type({:ok, %{}} = result), do: result
+
+  defp sanitize_name({:error, _} = error), do: error
+
+  defp sanitize_name({:ok, %{name: nil}}),
+    do: {:error, "Invalid purl: :name is a required field."}
+
+  defp sanitize_name({:ok, %{}} = result), do: result
+
+  defp sanitize_namespace({:error, _} = error), do: error
+
+  defp sanitize_namespace({:ok, %{}} = result), do: result
+
+  defp sanitize_version({:error, _} = error), do: error
+
+  defp sanitize_version({:ok, %{}} = result), do: result
+
+  defp sanitize_qualifiers({:error, _} = error), do: error
+
+  defp sanitize_qualifiers({:ok, %{qualifiers: nil}} = result), do: result
+
+  defp sanitize_qualifiers({:ok, %{qualifiers: qualifiers}} = result) do
+    case qualifiers
+         |> Enum.find(nil, fn {key, _} ->
+           not (key =~ ~r/^[[:alpha:]\.-_][[:alnum:]\.-_]*$/)
+         end) do
+      nil ->
+        result
+
+      {key, _} ->
+        {:error, "Invalid purl: qualifier #{inspect(key)} contains an illegal character."}
+    end
+  end
+
+  defp sanitize_subpath({:error, _} = error), do: error
+
+  defp sanitize_subpath({:ok, %{}} = result), do: result
+
+  ################################################################
+  # String building functions
+  ################################################################
+
+  defp build_purl(%__MODULE__{} = purl) do
+    with {:ok, acc} <- build_scheme(purl, []),
          {:ok, acc} <- build_type(purl, acc),
+         {:ok, acc} <- build_namespace(purl, acc),
          {:ok, acc} <- build_name(purl, acc),
          {:ok, acc} <- build_version(purl, acc),
          {:ok, acc} <- build_qualifiers(purl, acc),
          {:ok, acc} <- build_subpath(purl, acc) do
-      acc
+      {:ok, acc |> Enum.reverse() |> :erlang.iolist_to_binary()}
     else
-      e -> e
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  defp parse_purl(purl) do
-    with {:ok, {purl, remainder}} <- parse_subpath(PackageUrl, purl),
-         {:ok, {purl, remainder}} <- parse_qualifiers(purl, remainder),
-         {:ok, {purl, remainder}} <- parse_scheme(purl, remainder),
-         {:ok, {purl, remainder}} <- parse_type(purl, remainder),
-         {:ok, {purl, remainder}} <- parse_version(purl, remainder),
-         {:ok, {purl, remainder}} <- parse_name(purl, remainder),
-         {:ok, {purl, ""}} <- parse_namespace(purl, remainder) do
-      {:ok, purl}
-    else
-      {:error, _message} -> nil
-    end
-  end
+  defp build_scheme(%__MODULE__{}, acc) when is_list(acc), do: {:ok, ["pkg:" | acc]}
 
-  defp parse_subpath(purl, remainder) do
-    # Split the purl string once from right on '#'
-    # The left side is the remainder
-    # Strip the right side from leading and trailing '/'
-    # Split this on '/'
-    # Discard any empty string segment from that split
-    # Discard any '.' or '..' segment from that split
-    # Percent-decode each segment
-    # UTF-8-decode each segment if needed in your programming language
-    # Join segments back with a '/'
-    # This is the subpath
-    {remainder, subpath} =
-      case String.split(remainder, "#", parts: 2) do
-        [remainder] ->
-          {remainder, nil}
+  defp build_type(%__MODULE__{type: type}, acc) when is_list(acc),
+    do: {:ok, [[type <> "/"] | acc]}
 
-        [remainder, right] ->
-          {remainder,
-           right
-           |> String.trim("/")
-           |> String.split("/")
-           |> Enum.reject(&(&1 in ["", ".", ".."]))
-           |> Enum.map(&URI.decode(&1))
-           |> Enum.join("/")}
-      end
+  defp build_namespace(%__MODULE__{namespace: nil}, acc) when is_list(acc), do: {:ok, acc}
 
+  defp build_namespace(%__MODULE__{namespace: namespace}, acc) when is_list(acc) do
     {:ok,
-     {
-       struct(purl, subpath: non_empty_or_nil(subpath)),
-       remainder
-     }}
+     [
+       (namespace
+        |> encodeURIComponent()
+        |> String.replace("%3A", ":")
+        |> String.replace("%2F", "/")) <> "/"
+       | acc
+     ]}
   end
 
-  defp parse_qualifiers(purl, remainder) do
-    # Split the remainder once from right on '?'
-    # The left side is the remainder
-    # The right side is the qualifiers string
-    # Split the qualifiers on '&'. Each part is a key=value pair
-    # For each pair, split the key=value once from left on '=':
-    # The key is the lowercase left side
-    # The value is the percent-decoded right side
-    # UTF-8-decode the value if needed in your programming language
-    # Discard any key/value pairs where the value is empty
-    # If the key is checksums, split the value on ',' to create a list of checksums
-    # This list of key/value is the qualifiers object
-
-    {remainder, qualifiers} =
-      case String.split(remainder, "?", parts: 2) do
-        [remainder] ->
-          {remainder, nil}
-
-        [remainder, right] ->
-          {remainder,
-           right
-           |> String.split("&")
-           |> Enum.map(&String.split(&1, "=", parts: 2))
-           |> Enum.map(fn [key, value] -> {String.downcase(key), URI.decode(value)} end)
-           |> Enum.reject(fn
-             {_, ""} -> true
-             {"", _} -> true
-             _ -> false
-           end)
-           # A key cannot start with a number
-           # The key must be composed only of ASCII letters and numbers, '.', '-' and '_' (period, dash and underscore)
-           |> Enum.filter(fn {key, _value} -> key =~ ~r/[[:alpha:]\.-_][[:alnum:]\.-_]*/ end)
-           # A key must NOT be percent-encoded
-           |> Enum.filter(fn {key, _value} -> key == URI.decode(key) end)
-           |> Enum.map(fn
-             {"checksums", value} -> {"checksums", String.split(value, ",")}
-             pair -> pair
-           end)
-           |> Enum.into(%{})}
-      end
-
-    {:ok, {struct(purl, qualifiers: qualifiers), remainder}}
+  defp build_name(%__MODULE__{name: name}, acc) when is_list(acc) do
+    {:ok,
+     [
+       name
+       |> encodeURIComponent()
+       |> String.replace("%3A", ":")
+       | acc
+     ]}
   end
 
-  defp parse_scheme(purl, remainder) do
-    # Split the remainder once from left on ':'
-    # The left side lowercased is the scheme
-    # The right side is the remainder
+  defp build_version(%__MODULE__{version: nil}, acc) when is_list(acc), do: {:ok, acc}
 
-    {scheme, remainder} =
-      case String.split(remainder, ":", parts: 2) do
-        [remainder] -> {"pkg", remainder}
-        [scheme, remainder] -> {String.downcase(scheme), remainder}
-      end
-
-    if scheme == "pkg" do
-      {:ok, {struct(purl, scheme: "pkg"), remainder}}
-    else
-      {:error, "Invalid scheme \"#{scheme}\""}
-    end
+  defp build_version(%__MODULE__{version: version}, acc) when is_list(acc) do
+    {:ok,
+     [
+       [
+         "@",
+         version
+         |> encodeURIComponent()
+         |> String.replace("%3A", ":")
+       ]
+       | acc
+     ]}
   end
 
-  defp parse_type(purl, remainder) do
-    # Strip the remainder from leading and trailing '/'
-    # Split this once from left on '/'
-    # The left side lowercased is the type
-    # The right side is the remainder
+  defp build_qualifiers(%__MODULE__{qualifiers: nil}, acc) when is_list(acc), do: {:ok, acc}
 
-    {type, remainder} =
-      case remainder
-           |> String.trim("/")
-           |> String.split("/", parts: 2) do
-        [left] -> {"pkg", left}
-        [left, remainder] -> {String.downcase(left), remainder}
-      end
-
-    # The package type is composed only of ASCII letters and numbers, '.', '+' and '-' (period, plus, and dash)
-    # The type cannot start with a number
-    # The type cannot contains spaces
-    # The type must NOT be percent-encoded
-
-    with true <- type =~ ~r/[[:alpha:]\.+-][[:alnum:]\.+.]*/,
-         true <- type == URI.decode(type) do
-      {:ok, {struct(purl, type: non_empty_or_nil(type)), remainder}}
-    else
-      _ -> {:error, "Invalid type \"#{type}\""}
-    end
+  defp build_qualifiers(%__MODULE__{qualifiers: qualifiers}, acc) when is_list(acc) do
+    {:ok,
+     [
+       [
+         "?",
+         qualifiers
+         |> Map.keys()
+         |> Enum.sort()
+         |> Enum.map(fn key ->
+           {key
+            |> encodeURIComponent()
+            |> String.replace("%3A", ":"),
+            Map.get(qualifiers, key)
+            |> encodeURI()
+            |> String.replace("%3A", ":")}
+         end)
+         |> Enum.map(fn {key, value} -> [key, "=", value] end)
+         |> Enum.intersperse("&")
+       ]
+       | acc
+     ]}
   end
 
-  defp parse_version(purl, remainder) do
-    # Split the remainder once from right on '@'
-    # The left side is the remainder
-    # Percent-decode the right side. This is the version.
-    # UTF-8-decode the version if needed in your programming language
-    # This is the version
+  defp build_subpath(%__MODULE__{subpath: nil}, acc) when is_list(acc), do: {:ok, acc}
 
-    {remainder, version} =
-      case remainder
-           |> String.reverse()
-           |> String.split("@", parts: 2)
-           |> Enum.map(&String.reverse/1)
-           |> Enum.reverse() do
-        [remainder] -> {"", remainder}
-        [remainder, right] -> {remainder, URI.decode(right)}
-      end
+  defp build_subpath(%__MODULE__{subpath: subpath}, acc) when is_list(acc),
+    do: {:ok, [["#" <> encodeURI(subpath)] | acc]}
 
-    {:ok, {struct(purl, version: non_empty_or_nil(version)), remainder}}
+  ################################################################
+  # Helper functions
+  ################################################################
+
+  defp trim_leading_slashes(string) do
+    # this strip '/, // and /// as possible in :// or :///
+    # from https://gist.github.com/refo/47632c8a547f2d9b6517#file-remove-leading-slash
+    # string.trim().replace(/^\/+/g, '');
+
+    # Regex.replace(~r/d/, String.trim(string), "")
+    string
+    |> String.trim()
+    |> String.trim_leading("/")
   end
 
-  defp parse_name(purl, remainder) do
-    # Split the remainder once from right on '/'
-    # The left side is the remainder
-    # Percent-decode the right side. This is the name
-    # UTF-8-decode this name if needed in your programming language
-    # Apply type-specific normalization to the name if needed
-    # This is the name
+  @uriComponentUnescaped String.to_charlist(
+                           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()/"
+                         )
 
-    {remainder, right} =
-      case remainder
-           |> String.reverse()
-           |> String.split("/", parts: 2)
-           |> Enum.map(&String.reverse/1)
-           |> Enum.reverse() do
-        [remainder] -> {"", remainder}
-        [remainder, right] -> {remainder, right}
-      end
+  # uriAlpha ::: one of
+  #   a b c d e f g h i j k l m n o p q r s t u v w x y z
+  #   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+  @uriAlpha 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-    name =
-      right
-      |> URI.decode()
-      |> normalize_name(purl.type)
+  # DecimalDigit :: one of
+  #   0 1 2 3 4 5 6 7 8 9
+  @decimalDigit '0123456789'
 
-    {:ok, {struct(purl, name: non_empty_or_nil(name)), remainder}}
-  end
+  #   uriMark ::: one of
+  #   - _ . ! ~ * ' ( )
+  @uriMark '-_.!~*\'()'
 
-  defp parse_namespace(purl, remainder) do
-    # Split the remainder on '/'
-    # Discard any empty segment from that split
-    # Percent-decode each segment
-    # UTF-8-decode the each segment if needed in your programming language
-    # Apply type-specific normalization to each segment if needed
-    # Join segments back with a '/'
-    # This is the namespace
+  # uriUnescaped :::
+  #   uriAlpha
+  #   DecimalDigit
+  #   uriMark
+  @uriUnescaped @uriAlpha ++ @decimalDigit ++ @uriMark
 
-    namespace =
-      remainder
-      |> String.split("/")
-      |> Enum.reject(&(&1 == ""))
-      |> Enum.map(&URI.decode/1)
-      |> Enum.map(&normalize_namespace(&1, purl.type))
-      |> Enum.join("/")
+  # uriReserved ::: one of
+  #   ; / ? : @ & = + $ ,
+  # @uriReserved ';/?:@&=+$,'
 
-    namespace = if namespace != "", do: namespace, else: nil
+  # Let reservedURISet be a String containing one instance of each character valid in uriReserved plus “#”.
+  def decodeURI(string) when is_binary(string),
+    do: URI.decode(string)
 
-    {:ok, {struct(purl, namespace: non_empty_or_nil(namespace)), ""}}
-  end
+  # Let reservedURIComponentSet be the empty String.
+  def decodeURIComponent(string) when is_binary(string),
+    do: URI.decode(string)
 
-  # The name is the repository name. It is not case sensitive and must be lowercased.
-  defp normalize_name(name, "bitbucket"), do: String.downcase(name)
-  # The name is the repository name. It is not case sensitive and must be lowercased.
-  defp normalize_name(name, "github"), do: String.downcase(name)
+  # Let unescapedURISet be a String containing one instance of each character valid in uriReserved and uriUnescaped plus “#”.
+  def encodeURI(string) when is_binary(string),
+    # do: URI.encode(string, &(&1 in (@uriReserved ++ @uriUnescaped ++ '#')))
+    do: URI.encode(string)
 
-  # PyPi treats - and _ as the same character and is not case sensitive. Therefore a Pypi package name must be lowercased and underscore _ replaced with a dash -
-  defp normalize_name(name, "pypi"), do: name |> String.downcase() |> String.replace("_", "-")
-
-  defp normalize_name(name, _type), do: name
-
-  # The namespace is the user or organization. It is not case sensitive and must be lowercased.
-  defp normalize_namespace(namespace, "bitbucket"), do: String.downcase(namespace)
-  # The namespace is the user or organization. It is not case sensitive and must be lowercased.
-  defp normalize_namespace(namespace, "github"), do: String.downcase(namespace)
-
-  defp normalize_namespace(namespace, _type), do: namespace
-
-  defp build_scheme(%PackageUrl{}, _acc) do
-    # Start a purl string with the "pkg:" scheme as a lowercase ASCII string
-    {:ok, "pkg:"}
-  end
-
-  defp build_type(%PackageUrl{type: nil}, _acc), do: {:error, "type required"}
-
-  defp build_type(%PackageUrl{type: type}, acc) do
-    # Append the type string to the purl as a lowercase ASCII string
-    # Append '/' to the purl
-    {:ok, acc <> String.downcase(type) <> "/"}
-  end
-
-  defp build_name(%PackageUrl{name: nil}, _acc), do: {:error, "name required"}
-
-  defp build_name(%PackageUrl{namespace: nil, name: name, type: type}, acc) do
-    # If the namespace is empty:
-    # Apply type-specific normalization to the name if needed
-    # UTF-8-encode the name if needed in your programming language
-    # Append the percent-encoded name to the purl
-    {:ok, acc <> (name |> normalize_name(type) |> URI.encode())}
-  end
-
-  defp build_name(%PackageUrl{namespace: namespace, name: name, type: type}, acc) do
-    # If the namespace is not empty:
-    # Strip the namespace from leading and trailing '/'
-    # Split on '/' as segments
-    # Apply type-specific normalization to each segment if needed
-    # UTF-8-encode each segment if needed in your programming language
-    # Percent-encode each segment
-    # Join the segments with '/'
-    # Append this to the purl
-    # Append '/' to the purl
-    # Strip the name from leading and trailing '/'
-    # Apply type-specific normalization to the name if needed
-    # UTF-8-encode the name if needed in your programming language
-    # Append the percent-encoded name to the purl
-    namespace =
-      namespace
-      |> String.trim("/")
-      |> String.split("/")
-      |> Enum.map(&normalize_namespace(&1, type))
-      |> Enum.map(&URI.encode/1)
-      |> Enum.join("/")
-
-    name =
-      name
-      |> String.trim("/")
-      |> normalize_name(type)
-
-    {:ok, acc <> namespace <> "/" <> name}
-  end
-
-  defp build_version(%PackageUrl{version: nil}, acc), do: {:ok, acc}
-
-  defp build_version(%PackageUrl{version: version}, acc) do
-    # If the version is not empty:
-    # Append '@' to the purl
-    # UTF-8-encode the version if needed in your programming language
-    # Append the percent-encoded version to the purl
-    {:ok, acc <> "@" <> URI.encode( version)}
-  end
-
-  defp build_qualifiers(%PackageUrl{qualifiers: nil}, acc), do: {:ok, acc}
-
-  defp build_qualifiers(%PackageUrl{qualifiers: qualifiers}, acc) do
-    # If the qualifiers are not empty and not composed only of key/value pairs where the value is empty:
-    # Append '?' to the purl
-    # Build a list from all key/value pair:
-    # discard any pair where the value is empty.
-    # UTF-8-encode each value if needed in your programming language
-    # If the key is checksums and this is a list of checksums join this list with a ',' to create this qualifier value
-    # create a string by joining the lowercased key, the equal '=' sign and the percent-encoded value to create a qualifier
-    # sort this list of qualifier strings lexicographically
-    # join this list of qualifier strings with a '&' ampersand
-    # Append this string to the purl
-    qualifiers =
-      qualifiers
-      |> Enum.reject(fn {_key, value} -> value == "" end)
-      |> Enum.map(fn
-        {"checksums", checksums} -> {"checksums", Enum.join(checksums, ",")}
-        pair -> pair
-      end)
-      |> Enum.map(fn {key, value} -> String.downcase(key) <> "=" <> URI.encode(value) end)
-      |> Enum.sort(:asc)
-      |> Enum.join("&")
-
-    {:ok, acc <> "?" <> qualifiers}
-  end
-
-  defp build_subpath(%PackageUrl{subpath: nil}, acc), do: {:ok, acc}
-
-  defp build_subpath(%PackageUrl{subpath: subpath}, acc) do
-    # If the subpath is not empty and not composed only of empty, '.' and '..' segments:
-    # Append '#' to the purl
-    # Strip the subpath from leading and trailing '/'
-    # Split this on '/' as segments
-    # Discard empty, '.' and '..' segments
-    # Percent-encode each segment
-    # UTF-8-encode each segment if needed in your programming language
-    # Join the segments with '/'
-    # Append this to the purl
-    subpath =
-      subpath
-      |> String.trim("/")
-      |> String.split("/")
-      |> Enum.reject(&(&1 in ["", ".", ".."]))
-      |> Enum.map(&URI.encode/1)
-      |> Enum.join("/")
-
-    if subpath == "" do
-      {:ok, acc}
-    else
-      {:ok, acc <> "#" <> subpath}
-    end
-  end
-
-  defp non_empty_or_nil(nil), do: nil
-  defp non_empty_or_nil(""), do: nil
-  defp non_empty_or_nil(value) when is_binary(value), do: value
+  # Let unescapedURIComponentSet be a String containing one instance of each character valid in uriUnescaped.
+  # Manually added '/' to be more JS compatible!
+  def encodeURIComponent(string) when is_binary(string),
+    # do: URI.encode_www_form(string)
+    do: URI.encode(string, &(&1 in @uriUnescaped))
 end
