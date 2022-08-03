@@ -5,7 +5,17 @@ defmodule PackageUrl do
 
   import Kernel, except: [to_string: 1]
 
-  defstruct scheme: nil,
+  alias PackageUrl.{
+    BitbucketPackage,
+    ConanPackage,
+    CranPackage,
+    GenericPackage,
+    GithubPackage,
+    PypiPackage,
+    SwiftPackage
+  }
+
+  defstruct scheme: "pkg",
             type: nil,
             namespace: nil,
             name: nil,
@@ -25,17 +35,9 @@ defmodule PackageUrl do
   end
 
   def new(map) when is_map(map) do
-    merged = %__MODULE__{} |> Map.from_struct() |> Map.merge(map)
-
-    with {:ok, options} <-
-           {:ok, merged}
-           |> sanitize_type()
-           |> sanitize_name()
-           |> sanitize_namespace()
-           |> sanitize_version()
-           |> sanitize_qualifiers()
-           |> sanitize_subpath() do
-      {:ok, struct(__MODULE__, options)}
+    with {:ok, merged} <- merge_defaults(map),
+         {:ok, sanitized} <- sanitize(merged) do
+      {:ok, struct(__MODULE__, sanitized)}
     else
       {:error, reason} -> {:error, reason}
     end
@@ -61,6 +63,8 @@ defmodule PackageUrl do
   # Private Functions
   ################################################################
 
+  defp merge_defaults(map), do: {:ok, %__MODULE__{} |> Map.from_struct() |> Map.merge(map)}
+
   ################################################################
   # Parsing functions
   ################################################################
@@ -69,8 +73,8 @@ defmodule PackageUrl do
 
   def parse_purl(purl) do
     with {:ok, scheme, remainder} <- parse_scheme(purl),
-         {:ok, type, _remainder} <- parse_type(remainder),
-         url <- URI.parse(purl),
+         {:ok, type, remainder} <- parse_type(remainder),
+         url <- URI.parse(remainder),
          {:ok, qualifiers} <- parse_qualifiers(url),
          {:ok, subpath} <- parse_subpath(url),
          :ok <- reject_userinfo(url),
@@ -127,7 +131,7 @@ defmodule PackageUrl do
   end
 
   defp parse_namespace_name(remainder) do
-    case remainder |> String.split("/") |> Enum.drop(1) |> Enum.reverse() do
+    case remainder |> String.split("/") |> Enum.reverse() do
       [""] ->
         {:ok, nil, nil}
 
@@ -147,48 +151,25 @@ defmodule PackageUrl do
   # Sanitizing functions
   ################################################################
 
-  defp sanitize_type({:error, _} = error), do: error
+  defp sanitize(%{type: type} = map) when is_binary(type),
+    # We're duplicating Package behaviour/GenericPackage functions here to unsure pattern matching on `type` below
+    do: sanitize_package(%{map | type: String.downcase(type)})
 
-  defp sanitize_type({:ok, %{type: nil}}),
-    do: {:error, "Invalid purl: :type is a required field."}
+  defp sanitize(map), do: sanitize_package(map)
 
-  defp sanitize_type({:ok, %{}} = result), do: result
+  defp sanitize_package(%{type: "bitbucket"} = map), do: BitbucketPackage.sanitize(map)
 
-  defp sanitize_name({:error, _} = error), do: error
+  defp sanitize_package(%{type: "conan"} = map), do: ConanPackage.sanitize(map)
 
-  defp sanitize_name({:ok, %{name: nil}}),
-    do: {:error, "Invalid purl: :name is a required field."}
+  defp sanitize_package(%{type: "cran"} = map), do: CranPackage.sanitize(map)
 
-  defp sanitize_name({:ok, %{}} = result), do: result
+  defp sanitize_package(%{type: "github"} = map), do: GithubPackage.sanitize(map)
 
-  defp sanitize_namespace({:error, _} = error), do: error
+  defp sanitize_package(%{type: "pypi"} = map), do: PypiPackage.sanitize(map)
 
-  defp sanitize_namespace({:ok, %{}} = result), do: result
+  defp sanitize_package(%{type: "swift"} = map), do: SwiftPackage.sanitize(map)
 
-  defp sanitize_version({:error, _} = error), do: error
-
-  defp sanitize_version({:ok, %{}} = result), do: result
-
-  defp sanitize_qualifiers({:error, _} = error), do: error
-
-  defp sanitize_qualifiers({:ok, %{qualifiers: nil}} = result), do: result
-
-  defp sanitize_qualifiers({:ok, %{qualifiers: qualifiers}} = result) do
-    case qualifiers
-         |> Enum.find(nil, fn {key, _} ->
-           not (key =~ ~r/^[[:alpha:]\.-_][[:alnum:]\.-_]*$/)
-         end) do
-      nil ->
-        result
-
-      {key, _} ->
-        {:error, "Invalid purl: qualifier #{inspect(key)} contains an illegal character."}
-    end
-  end
-
-  defp sanitize_subpath({:error, _} = error), do: error
-
-  defp sanitize_subpath({:ok, %{}} = result), do: result
+  defp sanitize_package(map), do: GenericPackage.sanitize(map)
 
   ################################################################
   # String building functions
@@ -296,10 +277,6 @@ defmodule PackageUrl do
     |> String.trim_leading("/")
   end
 
-  @uriComponentUnescaped String.to_charlist(
-                           "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()/"
-                         )
-
   # uriAlpha ::: one of
   #   a b c d e f g h i j k l m n o p q r s t u v w x y z
   #   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -337,7 +314,6 @@ defmodule PackageUrl do
     do: URI.encode(string)
 
   # Let unescapedURIComponentSet be a String containing one instance of each character valid in uriUnescaped.
-  # Manually added '/' to be more JS compatible!
   def encodeURIComponent(string) when is_binary(string),
     # do: URI.encode_www_form(string)
     do: URI.encode(string, &(&1 in @uriUnescaped))
