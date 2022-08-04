@@ -1,6 +1,7 @@
 defmodule PackageUrl do
   @moduledoc """
-  Documentation for `PackageUrl`.
+  A [PackageUrl](https://github.com/package-url/purl-spec) library in pure
+  Elixir.
   """
 
   import Kernel, except: [to_string: 1]
@@ -11,6 +12,7 @@ defmodule PackageUrl do
     CranPackage,
     GenericPackage,
     GithubPackage,
+    HexPackage,
     PypiPackage,
     SwiftPackage
   }
@@ -21,15 +23,73 @@ defmodule PackageUrl do
             name: nil,
             version: nil,
             qualifiers: nil,
-            subpath: nil,
-            remainder: nil
+            subpath: nil
 
-  def new(nil), do: nil
+  @type t :: %__MODULE__{
+          scheme: binary() | nil,
+          type: binary() | nil,
+          namespace: binary() | nil,
+          name: binary() | nil,
+          version: binary() | nil,
+          qualifiers: %{optional(binary()) => binary() | map() | nil} | nil,
+          subpath: binary() | nil
+        }
 
-  def new(purl) when is_binary(purl), do: parse_purl(purl)
+  @doc """
+  Parses a PackageUrl into its components.
 
-  def new(options) when is_list(options) do
-    options
+  This function accepts binaries as well as keyword lists and maps. Returns an
+  `{:ok, result}` tuple on success. Returns an `{:error, reason}` tuple if the
+  (type-specific) validation fails.
+
+  ## Examples
+
+  ```elixir
+  iex(1)> PackageUrl.new("pkg:maven/org.apache.commons/io@1.3.4")
+  {:ok,
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }}
+  iex(2)> PackageUrl.new(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
+  {:ok,
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }}
+  iex(3)> PackageUrl.new(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
+  {:ok,
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }}
+  ```
+
+  ```elixir
+  iex(7)> PackageUrl.new("pkg:maven/@1.3.4")
+  {:error, "Invalid purl: :name is a required field."}
+  ```
+  """
+
+  def new(purl) when is_binary(purl), do: parse(purl)
+
+  def new(list) when is_list(list) do
+    list
     |> Enum.into(%{})
     |> new()
   end
@@ -37,11 +97,53 @@ defmodule PackageUrl do
   def new(map) when is_map(map) do
     with {:ok, merged} <- merge_defaults(map),
          {:ok, sanitized} <- sanitize(merged) do
-      {:ok, struct(__MODULE__, sanitized)}
+      {:ok, sanitized}
     else
       {:error, reason} -> {:error, reason}
     end
   end
+
+  @doc """
+  Parses a PackageUrl into its components.
+
+  This function accepts binaries as well as keyword lists and maps. Raises an
+  exception if the (type-specific) validation fails.
+
+  ## Examples
+
+  ```elixir
+  iex(1)> PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }
+  iex(2)> PackageUrl.new!(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }
+  iex(3)> PackageUrl.new!(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }
+  ```
+  """
 
   def new!(purl) do
     case new(purl) do
@@ -50,7 +152,46 @@ defmodule PackageUrl do
     end
   end
 
-  def to_string(%__MODULE__{} = purl), do: build_purl(purl)
+  @doc """
+  Returns the string representation of the given `PackageUrl` struct.
+
+  Return `{:ok,string}` on success. If the (type-specific) validation fails
+  return a `{:error, reason}` tuple.
+
+  ## Examples
+  ```elixir
+  iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  iex(2)> PackageUrl.to_string(purl)
+  {:ok, "pkg:maven/org.apache.commons/io@1.3.4"}
+  ```
+
+  ```elixir
+  iex(1)> invalid_purl = %PackageUrl{}
+  iex(2)> PackageUrl.to_string(invalid_purl)
+  {:error, "Invalid purl: :type is a required field."}
+  ```
+  """
+
+  def to_string(%__MODULE__{} = purl) do
+    with {:ok, sanitized} <- sanitize(purl) do
+      build_purl(sanitized)
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Returns the string representation of the given `PackageUrl` struct.
+
+  Raises an exception if the (type-specific) validation fails.
+
+  ## Examples
+  ```elixir
+  iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  iex(2)> PackageUrl.to_string!(purl)
+  "pkg:maven/org.apache.commons/io@1.3.4"
+  ```
+  """
 
   def to_string!(%__MODULE__{} = purl) do
     case to_string(purl) do
@@ -60,18 +201,12 @@ defmodule PackageUrl do
   end
 
   ################################################################
-  # Private Functions
-  ################################################################
-
-  defp merge_defaults(map), do: {:ok, %__MODULE__{} |> Map.from_struct() |> Map.merge(map)}
-
-  ################################################################
   # Parsing functions
   ################################################################
-  def parse_purl(nil), do: {:error, "A purl string argument is required."}
-  def parse_purl(""), do: {:error, "A purl string argument is required."}
 
-  def parse_purl(purl) do
+  # defp parse(nil), do: {:error, "A purl string argument is required."}
+
+  defp parse(purl) when is_binary(purl) do
     with {:ok, scheme, remainder} <- parse_scheme(purl),
          {:ok, type, remainder} <- parse_type(remainder),
          url <- URI.parse(remainder),
@@ -111,7 +246,7 @@ defmodule PackageUrl do
     end
   end
 
-  defp parse_qualifiers(url) do
+  def parse_qualifiers(url) do
     case url.query do
       nil -> {:ok, nil}
       query -> {:ok, URI.decode_query(query)}
@@ -151,11 +286,11 @@ defmodule PackageUrl do
   # Sanitizing functions
   ################################################################
 
-  defp sanitize(%{type: type} = map) when is_binary(type),
+  defp sanitize(%__MODULE__{type: type} = map) when is_binary(type),
     # We're duplicating Package behaviour/GenericPackage functions here to unsure pattern matching on `type` below
     do: sanitize_package(%{map | type: String.downcase(type)})
 
-  defp sanitize(map), do: sanitize_package(map)
+  defp sanitize(map) when is_map(map), do: sanitize_package(map)
 
   defp sanitize_package(%{type: "bitbucket"} = map), do: BitbucketPackage.sanitize(map)
 
@@ -164,6 +299,8 @@ defmodule PackageUrl do
   defp sanitize_package(%{type: "cran"} = map), do: CranPackage.sanitize(map)
 
   defp sanitize_package(%{type: "github"} = map), do: GithubPackage.sanitize(map)
+
+  defp sanitize_package(%{type: "hex"} = map), do: HexPackage.sanitize(map)
 
   defp sanitize_package(%{type: "pypi"} = map), do: PypiPackage.sanitize(map)
 
@@ -184,8 +321,6 @@ defmodule PackageUrl do
          {:ok, acc} <- build_qualifiers(purl, acc),
          {:ok, acc} <- build_subpath(purl, acc) do
       {:ok, acc |> Enum.reverse() |> :erlang.iolist_to_binary()}
-    else
-      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -266,6 +401,11 @@ defmodule PackageUrl do
   # Helper functions
   ################################################################
 
+  defp merge_defaults(map) do
+    merged = %__MODULE__{} |> Map.from_struct() |> Map.merge(map)
+    {:ok, struct(__MODULE__, merged)}
+  end
+
   defp trim_leading_slashes(string) do
     # this strip '/, // and /// as possible in :// or :///
     # from https://gist.github.com/refo/47632c8a547f2d9b6517#file-remove-leading-slash
@@ -301,20 +441,24 @@ defmodule PackageUrl do
   # @uriReserved ';/?:@&=+$,'
 
   # Let reservedURISet be a String containing one instance of each character valid in uriReserved plus “#”.
-  def decodeURI(string) when is_binary(string),
+
+  defp decodeURI(string) when is_binary(string),
     do: URI.decode(string)
 
   # Let reservedURIComponentSet be the empty String.
-  def decodeURIComponent(string) when is_binary(string),
+
+  defp decodeURIComponent(string) when is_binary(string),
     do: URI.decode(string)
 
   # Let unescapedURISet be a String containing one instance of each character valid in uriReserved and uriUnescaped plus “#”.
-  def encodeURI(string) when is_binary(string),
+
+  defp encodeURI(string) when is_binary(string),
     # do: URI.encode(string, &(&1 in (@uriReserved ++ @uriUnescaped ++ '#')))
     do: URI.encode(string)
 
   # Let unescapedURIComponentSet be a String containing one instance of each character valid in uriUnescaped.
-  def encodeURIComponent(string) when is_binary(string),
+
+  defp encodeURIComponent(string) when is_binary(string),
     # do: URI.encode_www_form(string)
     do: URI.encode(string, &(&1 in @uriUnescaped))
 end

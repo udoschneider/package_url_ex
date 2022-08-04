@@ -1,12 +1,13 @@
 defmodule PackageUrl.PypiPackage do
-  use PackageUrl.Package
+  use PackageUrl.CustomPackage
 
   @moduledoc """
   Python-based packages:
 
   - The default repository is `https://pypi.python.org`
   - PyPi treats `-` and `_` as the same character and is not case sensitive.
-    Therefore a Pypi package `:name` must be lowercased and underscore `_` replaced with a dash `-`
+    Therefore a Pypi package `name` must be lowercased and underscore `_`
+    replaced with a dash `-`
   - Examples:
     ```
     pkg:pypi/django@1.11.1
@@ -14,11 +15,14 @@ defmodule PackageUrl.PypiPackage do
     ```
   """
 
-  @impl PackageUrl.Package
-  def sanitize_name(%{name: name} = map) when is_binary(name) do
-    sanitized_name = name |> String.downcase() |> String.replace("_", "-")
-    {:ok, %{map | name: sanitized_name}}
+  @impl PackageUrl.CustomPackage
+  def sanitize_name(name) when is_binary(name) do
+    with {:ok, name} <- super(name) do
+      {:ok, name |> String.downcase() |> String.replace("_", "-")}
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
-  def sanitize_name(map), do: super(map)
+  def sanitize_name(name), do: super(name)
 end

@@ -5,8 +5,7 @@ defmodule PackageUrl.CranPackageTest do
 
   describe "version" do
     test "is not nil" do
-      map = %{version: nil}
-      assert match?({:error, _}, CranPackage.sanitize_version(map))
+      assert match?({:error, _}, CranPackage.sanitize_version(nil))
     end
   end
 end

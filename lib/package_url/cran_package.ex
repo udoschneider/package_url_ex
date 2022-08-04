@@ -1,11 +1,12 @@
 defmodule PackageUrl.CranPackage do
-  use PackageUrl.Package
+  use PackageUrl.CustomPackage
 
   @moduledoc """
   CRAN R packages
 
   - The default repository is https://cran.r-project.org
-  - The name is the package name and is case sensitive, but there cannot be two packages on CRAN with the same name ignoring case.
+  - The name is the package name and is case sensitive, but there cannot be two
+    packages on CRAN with the same name ignoring case.
   - The version is the package version.
   - Examples:
   ```
@@ -16,13 +17,15 @@ defmodule PackageUrl.CranPackage do
 
   > #### Note {: .neutral}
   >
-  > Although not documented in https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#cran
-  > it seems that `:namespace`, `:version` and `:qualifiers.channel` are required attributes!
+  > Although not documented in
+  > https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#cran it
+  > seems that `namespace`, `version` and `qualifiers.channel` are required
+  > attributes!
   """
 
-  @impl PackageUrl.Package
-  def sanitize_version(%{version: nil}),
+  @impl PackageUrl.CustomPackage
+  def sanitize_version(nil),
     do: {:error, "Invalid purl: :version is a required field for CRAN packages."}
 
-  def sanitize_version(map), do: super(map)
+  def sanitize_version(version), do: super(version)
 end

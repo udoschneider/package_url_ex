@@ -23,7 +23,7 @@ defmodule PackageUrlTest do
     |> Enum.into(%{})
     |> Map.values()
 
-  describe "it should not be possible to create invalid PackageURLs /" do
+  describe "it should not be possible to create invalid PackageUrls /" do
     for obj <- test_suite_data do
       if obj.is_invalid do
         test "#{obj.description}" do
@@ -54,7 +54,7 @@ defmodule PackageUrlTest do
     end
   end
 
-  describe "it should not be possible to parse invalid PackageURLs /" do
+  describe "it should not be possible to parse invalid PackageUrls /" do
     for obj <- test_suite_data do
       if obj.is_invalid do
         test "#{obj.description}" do
@@ -70,7 +70,7 @@ defmodule PackageUrlTest do
     end
   end
 
-  describe "it should be able to create valid PackageURLs /" do
+  describe "it should be able to create valid PackageUrls /" do
     for obj <- test_suite_data do
       unless obj.is_invalid do
         test "#{obj.description}" do
@@ -95,7 +95,7 @@ defmodule PackageUrlTest do
     end
   end
 
-  describe "should be able to convert valid PackageURLs to a string /" do
+  describe "should be able to convert valid PackageUrls to a string /" do
     for obj <- test_suite_data do
       unless obj.is_invalid do
         test "#{obj.description}" do
@@ -115,7 +115,7 @@ defmodule PackageUrlTest do
     end
   end
 
-  describe "it should be able to parse valid PackageURLs /" do
+  describe "it should be able to parse valid PackageUrls /" do
     for obj <- test_suite_data do
       unless obj.is_invalid do
         test "#{obj.description}" do

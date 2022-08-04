@@ -6,16 +6,14 @@ defmodule PackageUrl.GithubPackageTest do
   describe "namespace" do
     test "is lowercased" do
       # The namespace is the user or organization. It is not case sensitive and must be lowercased.
-      map = %{namespace: "MyOrg"}
-      assert GithubPackage.sanitize_namespace(map) == {:ok, %{namespace: "myorg"}}
+      assert GithubPackage.sanitize_namespace("MyOrg") == {:ok, "myorg"}
     end
   end
 
   describe "name" do
     test "is lowercased" do
       # The name is the repository name. It is not case sensitive and must be lowercased.
-      map = %{name: "MyRepo"}
-      assert GithubPackage.sanitize_name(map) == {:ok, %{name: "myrepo"}}
+      assert GithubPackage.sanitize_name("MyRepo") == {:ok, "myrepo"}
     end
   end
 end

@@ -1,3 +1,3 @@
 defmodule PackageUrl.GenericPackage do
-  use PackageUrl.Package
+  use PackageUrl.CustomPackage
 end

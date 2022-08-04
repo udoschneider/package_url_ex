@@ -1,19 +1,19 @@
-defmodule PackageUrl.GithubPackage do
+defmodule PackageUrl.HexPackage do
   use PackageUrl.CustomPackage
 
   @moduledoc """
-  Github-based packages:
+  Hex packages
 
-  - The default repository is `https://github.com`
-  - The `namespace` is the user or organization. It is not case sensitive and
-    must be lowercased.
-  - The `name` is the repository name. It is not case sensitive and must be
-    lowercased.
-  - The version is a commit or tag
-  - Examples:
+  - The default repository is https://repo.hex.pm.
+  - The `namespace` is optional; it may be used to specify the organization for private packages on hex.pm. It is not case sensitive and must be lowercased.
+  - The `name` is not case sensitive and must be lowercased.
+
+  Examples:
   ```
-  pkg:github/package-url/purl-spec@244fd47e07d1004
-  pkg:github/package-url/purl-spec@244fd47e07d1004#everybody/loves/dogs
+  pkg:hex/jason@1.1.2
+  pkg:hex/acme/foo@2.3.
+  pkg:hex/phoenix_html@2.13.3#priv/static/phoenix_html.js
+  pkg:hex/bar@1.2.3?repository_url=https://myrepo.example.com
   ```
   """
 

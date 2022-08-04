@@ -5,15 +5,13 @@ defmodule PackageUrl.SwiftPackageTest do
 
   describe "namespace" do
     test "is not nil" do
-      map = %{namespace: nil}
-      assert match?({:error, _}, SwiftPackage.sanitize_namespace(map))
+      assert match?({:error, _}, SwiftPackage.sanitize_namespace(nil))
     end
   end
 
   describe "version" do
     test "is not nil" do
-      map = %{version: nil}
-      assert match?({:error, _}, SwiftPackage.sanitize_version(map))
+      assert match?({:error, _}, SwiftPackage.sanitize_version(nil))
     end
   end
 end
