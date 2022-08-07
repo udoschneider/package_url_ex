@@ -53,5 +53,5 @@ Documentation can be generated with
 
 ## License
 
-PackageUrl is released under the Apache License 2.0 - see the [LICENSE](LICENSE)
+PackageUrl is released under the MIT License - see the [LICENSE](LICENSE)
 file.
