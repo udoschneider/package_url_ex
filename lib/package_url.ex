@@ -86,7 +86,12 @@ defmodule PackageUrl do
   ```
   """
 
-  def new(purl) when is_binary(purl), do: parse(purl)
+  def new(string) when is_binary(string) do
+    case parse(string) do
+      {:ok, map} -> new(map)
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
   def new(list) when is_list(list) do
     list
@@ -216,15 +221,16 @@ defmodule PackageUrl do
          path <- trim_leading_slashes(url.path),
          {:ok, version, remainder} <- parse_version(path),
          {:ok, namespace, name} <- parse_namespace_name(remainder) do
-      new(
-        scheme: scheme,
-        type: type,
-        qualifiers: qualifiers,
-        subpath: subpath,
-        version: version,
-        namespace: namespace,
-        name: name
-      )
+      {:ok,
+       %{
+         scheme: scheme,
+         type: type,
+         namespace: namespace,
+         name: name,
+         subpath: subpath,
+         qualifiers: qualifiers,
+         version: version
+       }}
     else
       {:error, reason} -> {:error, reason}
     end
@@ -441,23 +447,19 @@ defmodule PackageUrl do
   # @uriReserved ';/?:@&=+$,'
 
   # Let reservedURISet be a String containing one instance of each character valid in uriReserved plus “#”.
-
   defp decodeURI(string) when is_binary(string),
     do: URI.decode(string)
 
   # Let reservedURIComponentSet be the empty String.
-
   defp decodeURIComponent(string) when is_binary(string),
     do: URI.decode(string)
 
   # Let unescapedURISet be a String containing one instance of each character valid in uriReserved and uriUnescaped plus “#”.
-
   defp encodeURI(string) when is_binary(string),
     # do: URI.encode(string, &(&1 in (@uriReserved ++ @uriUnescaped ++ '#')))
     do: URI.encode(string)
 
   # Let unescapedURIComponentSet be a String containing one instance of each character valid in uriUnescaped.
-
   defp encodeURIComponent(string) when is_binary(string),
     # do: URI.encode_www_form(string)
     do: URI.encode(string, &(&1 in @uriUnescaped))
