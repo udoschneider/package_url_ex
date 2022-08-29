@@ -1,5 +1,7 @@
 # PackageUrl
 
+<!-- MODULEDOC -->
+
 A [PackageUrl](https://github.com/package-url/purl-spec) library in pure Elixir.
 
 The current implementation fully passes the test suites from the official
@@ -46,6 +48,9 @@ iex> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
 iex> PackageUrl.to_string!(purl)
 "pkg:maven/org.apache.commons/io@1.3.4"
 ```
+
+<!-- MODULEDOC -->
+
 Documentation can be generated with
 [ExDoc](https://github.com/elixir-lang/ex_doc) and published on
 [HexDocs](https://hexdocs.pm). Once published, the docs can be found at

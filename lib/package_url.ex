@@ -1,8 +1,7 @@
 defmodule PackageUrl do
-  @moduledoc """
-  A [PackageUrl](https://github.com/package-url/purl-spec) library in pure
-  Elixir.
-  """
+  @moduledoc File.read!("README.md")
+             |> String.split("<!-- MODULEDOC -->")
+             |> Enum.fetch!(1)
 
   import Kernel, except: [to_string: 1]
 
