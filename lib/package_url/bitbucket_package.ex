@@ -1,14 +1,10 @@
 defmodule PackageUrl.BitbucketPackage do
   @moduledoc """
-  Bitbucket-based packages:
+  Bitbucket-based packages.
 
-  - The default repository is https://bitbucket.org
-  - The `namespace` is the user or organization. It is not case sensitive and
-    must be lowercased.
-  - The `name` is the repository name. It is not case sensitive and must be
-    lowercased.
-  - The version is a commit or tag
-  - Examples:
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#bitbucket
+
+  Examples:
   ```
   pkg:bitbucket/birkenfeld/pygments-main@244fd47e07d1014f0aed9c
   ```

@@ -1,10 +1,8 @@
 defmodule PackageUrl.HexPackage do
   @moduledoc """
-  Hex packages
+  Elixir Hex packages
 
-  - The default repository is https://repo.hex.pm.
-  - The `namespace` is optional; it may be used to specify the organization for private packages on hex.pm. It is not case sensitive and must be lowercased.
-  - The `name` is not case sensitive and must be lowercased.
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#hex
 
   Examples:
   ```

@@ -1,32 +1,8 @@
 defmodule PackageUrl.ConanPackage do
   @moduledoc """
   Conan C/C++ packages.
-  The purl is designed to closely resemble the Conan-native
-  `<package-name>/<package-version>@<user>/<channel>`
-  syntax for package references.
 
-  - `name`: The Conan `<package-name>`.
-  - `version`: The Conan `<package-version>`.
-  - `namespace`: The vendor of the package.
-  - `qualifier.user`: The Conan `<user>`. Only required if the Conan package
-    was published with `<user>`.
-  - `qualifier.channel`: The Conan `<channel>`. Only required if the Conan
-    package was published with Conan `<channel>`.
-  - `qualifier.rrev`: The Conan recipe revision (optional). If omitted, the
-    purl refers to the latest recipe revision available for the given version.
-  - `:ualifier.prev`: The Conan package revision (optional). If omitted, the
-    purl refers to the latest package revision available for the given version
-    and recipe revision.
-  - `qualifier.repository_url`: The Conan repository where the package is
-  available (optional). If ommitted, https://center.conan.io as default
-  repository   is assumed.
-
-  Additional qualifiers can be used to distinguish Conan packages with different
-  settings or options, e.g. `os=Linux`, `build_type=Debug` or `shared=True`.
-
-  If no additional qualifiers are used to distinguish Conan packages build with
-  different settings or options, then the purl is ambiguous and it is up to
-  the user to work out which package is being referred to (e.g. with context information).
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conan
 
   Examples:
   ```

@@ -2,13 +2,9 @@ defmodule PackageUrl.GithubPackage do
   @moduledoc """
   Github-based packages:
 
-  - The default repository is `https://github.com`
-  - The `namespace` is the user or organization. It is not case sensitive and
-    must be lowercased.
-  - The `name` is the repository name. It is not case sensitive and must be
-    lowercased.
-  - The version is a commit or tag
-  - Examples:
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#github
+
+  Examples:
   ```
   pkg:github/package-url/purl-spec@244fd47e07d1004
   pkg:github/package-url/purl-spec@244fd47e07d1004#everybody/loves/dogs

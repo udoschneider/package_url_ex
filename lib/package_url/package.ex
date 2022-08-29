@@ -8,8 +8,6 @@ defmodule PackageUrl.Package do
 
   defmacro __using__(_opts) do
     quote do
-      @doc false
-
       @doc "Sanitize/filter the `type` attribute of a `PackageUrl`."
       @spec sanitize_type(type :: binary() | nil) ::
               {:ok, result :: binary()} | {:error, reason :: term()}

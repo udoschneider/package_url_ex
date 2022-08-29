@@ -1,6 +1,8 @@
 defmodule PackageUrl.SwiftPackage do
   @moduledoc """
-  PackageUrl sanitization for Swift packages.
+  Swift packages.
+
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#swift
 
   > #### Note {: .neutral}
   >
