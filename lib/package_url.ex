@@ -318,89 +318,88 @@ defmodule PackageUrl do
   ################################################################
 
   defp build_purl(%__MODULE__{} = purl) do
-    with {:ok, acc} <- build_scheme(purl, []),
-         {:ok, acc} <- build_type(purl, acc),
-         {:ok, acc} <- build_namespace(purl, acc),
-         {:ok, acc} <- build_name(purl, acc),
-         {:ok, acc} <- build_version(purl, acc),
-         {:ok, acc} <- build_qualifiers(purl, acc),
-         {:ok, acc} <- build_subpath(purl, acc) do
-      {:ok, acc |> Enum.reverse() |> :erlang.iolist_to_binary()}
+    with {:ok, iolist} <- build_scheme(purl, []),
+         {:ok, iolist} <- build_type(purl, iolist),
+         {:ok, iolist} <- build_namespace(purl, iolist),
+         {:ok, iolist} <- build_name(purl, iolist),
+         {:ok, iolist} <- build_version(purl, iolist),
+         {:ok, iolist} <- build_qualifiers(purl, iolist),
+         {:ok, iolist} <- build_subpath(purl, iolist) do
+      {:ok, :erlang.iolist_to_binary(iolist)}
     end
   end
 
-  defp build_scheme(%__MODULE__{}, acc) when is_list(acc), do: {:ok, ["pkg:" | acc]}
+  defp build_scheme(%__MODULE__{}, iolist) when is_list(iolist), do: {:ok, ["pkg:"]}
 
-  defp build_type(%__MODULE__{type: type}, acc) when is_list(acc),
-    do: {:ok, [[type <> "/"] | acc]}
+  defp build_type(%__MODULE__{type: type}, iolist) when is_list(iolist),
+    do: {:ok, [iolist, type, "/"]}
 
-  defp build_namespace(%__MODULE__{namespace: nil}, acc) when is_list(acc), do: {:ok, acc}
+  defp build_namespace(%__MODULE__{namespace: nil}, iolist) when is_list(iolist),
+    do: {:ok, iolist}
 
-  defp build_namespace(%__MODULE__{namespace: namespace}, acc) when is_list(acc) do
+  defp build_namespace(%__MODULE__{namespace: namespace}, iolist) when is_list(iolist) do
     {:ok,
      [
-       (namespace
-        |> PackageUrl.URI.encode_uri_component()
-        |> String.replace("%3A", ":")
-        |> String.replace("%2F", "/")) <> "/"
-       | acc
+       iolist,
+       namespace
+       |> PackageUrl.URI.encode_uri_component()
+       |> String.replace("%3A", ":")
+       |> String.replace("%2F", "/"),
+       "/"
      ]}
   end
 
-  defp build_name(%__MODULE__{name: name}, acc) when is_list(acc) do
+  defp build_name(%__MODULE__{name: name}, iolist) when is_list(iolist) do
     {:ok,
      [
+       iolist,
        name
        |> PackageUrl.URI.encode_uri_component()
        |> String.replace("%3A", ":")
-       | acc
      ]}
   end
 
-  defp build_version(%__MODULE__{version: nil}, acc) when is_list(acc), do: {:ok, acc}
+  defp build_version(%__MODULE__{version: nil}, iolist) when is_list(iolist), do: {:ok, iolist}
 
-  defp build_version(%__MODULE__{version: version}, acc) when is_list(acc) do
+  defp build_version(%__MODULE__{version: version}, iolist) when is_list(iolist) do
     {:ok,
      [
-       [
-         "@",
-         version
-         |> PackageUrl.URI.encode_uri_component()
-         |> String.replace("%3A", ":")
-       ]
-       | acc
+       iolist,
+       "@",
+       version
+       |> PackageUrl.URI.encode_uri_component()
+       |> String.replace("%3A", ":")
      ]}
   end
 
-  defp build_qualifiers(%__MODULE__{qualifiers: nil}, acc) when is_list(acc), do: {:ok, acc}
+  defp build_qualifiers(%__MODULE__{qualifiers: nil}, iolist) when is_list(iolist),
+    do: {:ok, iolist}
 
-  defp build_qualifiers(%__MODULE__{qualifiers: qualifiers}, acc) when is_list(acc) do
+  defp build_qualifiers(%__MODULE__{qualifiers: qualifiers}, iolist) when is_list(iolist) do
     {:ok,
      [
-       [
-         "?",
-         qualifiers
-         |> Map.keys()
-         |> Enum.sort()
-         |> Enum.map(fn key ->
-           {key
-            |> PackageUrl.URI.encode_uri_component()
-            |> String.replace("%3A", ":"),
-            Map.get(qualifiers, key)
-            |> PackageUrl.URI.encode_uri()
-            |> String.replace("%3A", ":")}
-         end)
-         |> Enum.map(fn {key, value} -> [key, "=", value] end)
-         |> Enum.intersperse("&")
-       ]
-       | acc
+       iolist,
+       "?",
+       qualifiers
+       |> Map.keys()
+       |> Enum.sort()
+       |> Enum.map(fn key ->
+         {key
+          |> PackageUrl.URI.encode_uri_component()
+          |> String.replace("%3A", ":"),
+          Map.get(qualifiers, key)
+          |> PackageUrl.URI.encode_uri()
+          |> String.replace("%3A", ":")}
+       end)
+       |> Enum.map(fn {key, value} -> [key, "=", value] end)
+       |> Enum.intersperse("&")
      ]}
   end
 
-  defp build_subpath(%__MODULE__{subpath: nil}, acc) when is_list(acc), do: {:ok, acc}
+  defp build_subpath(%__MODULE__{subpath: nil}, iolist) when is_list(iolist), do: {:ok, iolist}
 
-  defp build_subpath(%__MODULE__{subpath: subpath}, acc) when is_list(acc),
-    do: {:ok, [["#" <> PackageUrl.URI.encode_uri(subpath)] | acc]}
+  defp build_subpath(%__MODULE__{subpath: subpath}, iolist) when is_list(iolist),
+    do: {:ok, [iolist, "#", PackageUrl.URI.encode_uri(subpath)]}
 
   ################################################################
   # Helper functions
