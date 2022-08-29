@@ -252,7 +252,7 @@ defmodule PackageUrl do
     end
   end
 
-  def parse_qualifiers(url) do
+  defp parse_qualifiers(url) do
     case url.query do
       nil -> {:ok, nil}
       query -> {:ok, URI.decode_query(query)}
