@@ -209,8 +209,6 @@ defmodule PackageUrl do
   # Parsing functions
   ################################################################
 
-  # defp parse(nil), do: {:error, "A purl string argument is required."}
-
   defp parse(purl) when is_binary(purl) do
     with {:ok, scheme, remainder} <- parse_scheme(purl),
          {:ok, type, remainder} <- parse_type(remainder),
@@ -293,7 +291,7 @@ defmodule PackageUrl do
   ################################################################
 
   defp sanitize(%__MODULE__{type: type} = map) when is_binary(type),
-    # We're duplicating Package behaviour/GenericPackage functions here to unsure pattern matching on `type` below
+    # We're duplicating Package behaviour/GenericPackage functions here to ensure pattern matching on `type` below
     do: sanitize_package(%{map | type: String.downcase(type)})
 
   defp sanitize(map) when is_map(map), do: sanitize_package(map)
@@ -413,11 +411,6 @@ defmodule PackageUrl do
   end
 
   defp trim_leading_slashes(string) do
-    # this strip '/, // and /// as possible in :// or :///
-    # from https://gist.github.com/refo/47632c8a547f2d9b6517#file-remove-leading-slash
-    # string.trim().replace(/^\/+/g, '');
-
-    # Regex.replace(~r/d/, String.trim(string), "")
     string
     |> String.trim()
     |> String.trim_leading("/")
