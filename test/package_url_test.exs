@@ -2,18 +2,18 @@ defmodule PackageUrlTest do
   use ExUnit.Case
   doctest PackageUrl
 
-  test_suite_data_1 =
-    "test/fixtures/test-suite-data-1.json"
+  test_suite_data_spec =
+    "test/fixtures/test-suite-data-spec.json"
     |> File.read!()
     |> Jason.decode!()
 
-  test_suite_data_2 =
-    "test/fixtures/test-suite-data-2.json"
+  test_suite_data_jspurl =
+    "test/fixtures/test-suite-data-jspurl.json"
     |> File.read!()
     |> Jason.decode!()
 
   test_suite_data =
-    (test_suite_data_1 ++ test_suite_data_2)
+    (test_suite_data_spec ++ test_suite_data_jspurl)
     |> Enum.map(fn test ->
       {test["description"],
        test
