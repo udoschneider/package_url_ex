@@ -1,6 +1,4 @@
 defmodule PackageUrl.SwiftPackage do
-  use PackageUrl.CustomPackage
-
   @moduledoc """
   PackageUrl sanitization for Swift packages.
 
@@ -10,6 +8,8 @@ defmodule PackageUrl.SwiftPackage do
   > https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#swift it
   > seems that `namespace` and `version` are required attributes!
   """
+
+  use PackageUrl.CustomPackage
 
   @impl PackageUrl.CustomPackage
   def sanitize_namespace(nil),

@@ -33,7 +33,7 @@ end
 ## Basic Usage
 
 ```elixir
-iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")       
+iex> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")       
 %PackageUrl{
   name: "io",
   namespace: "org.apache.commons",
@@ -43,7 +43,7 @@ iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
   type: "maven",
   version: "1.3.4"
 }
-iex(2)> PackageUrl.to_string!(purl)
+iex> PackageUrl.to_string!(purl)
 "pkg:maven/org.apache.commons/io@1.3.4"
 ```
 Documentation can be generated with

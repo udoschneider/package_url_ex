@@ -1,6 +1,4 @@
 defmodule PackageUrl.PypiPackage do
-  use PackageUrl.CustomPackage
-
   @moduledoc """
   Python-based packages:
 
@@ -15,11 +13,12 @@ defmodule PackageUrl.PypiPackage do
     ```
   """
 
+  use PackageUrl.CustomPackage
+
   @impl PackageUrl.CustomPackage
   def sanitize_name(name) when is_binary(name) do
-    with {:ok, name} <- super(name) do
-      {:ok, name |> String.downcase() |> String.replace("_", "-")}
-    else
+    case super(name) do
+      {:ok, name} -> {:ok, name |> String.downcase() |> String.replace("_", "-")}
       {:error, reason} -> {:error, reason}
     end
   end

@@ -151,14 +151,6 @@ defmodule PackageUrlTest do
         test "#{obj.description}" do
           purl = PackageUrl.new!(unquote(obj.purl))
           canonical_purl = PackageUrl.new!(unquote(obj.canonical_purl))
-
-          unless purl.namespace == canonical_purl.namespace do
-            IO.inspect(unquote(obj.purl))
-            IO.inspect(purl)
-            IO.inspect(unquote(obj.canonical_purl))
-            IO.inspect(canonical_purl)
-          end
-
           assert purl.type == canonical_purl.type
           assert purl.namespace == canonical_purl.namespace
           assert purl.name == canonical_purl.name

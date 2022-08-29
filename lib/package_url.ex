@@ -45,7 +45,7 @@ defmodule PackageUrl do
   ## Examples
 
   ```elixir
-  iex(1)> PackageUrl.new("pkg:maven/org.apache.commons/io@1.3.4")
+  iex> PackageUrl.new("pkg:maven/org.apache.commons/io@1.3.4")
   {:ok,
   %PackageUrl{
     name: "io",
@@ -56,7 +56,7 @@ defmodule PackageUrl do
     type: "maven",
     version: "1.3.4"
   }}
-  iex(2)> PackageUrl.new(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
+  iex> PackageUrl.new(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
   {:ok,
   %PackageUrl{
     name: "io",
@@ -67,7 +67,7 @@ defmodule PackageUrl do
     type: "maven",
     version: "1.3.4"
   }}
-  iex(3)> PackageUrl.new(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
+  iex> PackageUrl.new(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
   {:ok,
   %PackageUrl{
     name: "io",
@@ -81,7 +81,7 @@ defmodule PackageUrl do
   ```
 
   ```elixir
-  iex(7)> PackageUrl.new("pkg:maven/@1.3.4")
+  iex> PackageUrl.new("pkg:maven/@1.3.4")
   {:error, "Invalid purl: :name is a required field."}
   ```
   """
@@ -117,7 +117,7 @@ defmodule PackageUrl do
   ## Examples
 
   ```elixir
-  iex(1)> PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  iex> PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
   %PackageUrl{
     name: "io",
     namespace: "org.apache.commons",
@@ -127,7 +127,7 @@ defmodule PackageUrl do
     type: "maven",
     version: "1.3.4"
   }
-  iex(2)> PackageUrl.new!(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
+  iex> PackageUrl.new!(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
   %PackageUrl{
     name: "io",
     namespace: "org.apache.commons",
@@ -137,7 +137,7 @@ defmodule PackageUrl do
     type: "maven",
     version: "1.3.4"
   }
-  iex(3)> PackageUrl.new!(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
+  iex> PackageUrl.new!(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
   %PackageUrl{
     name: "io",
     namespace: "org.apache.commons",
@@ -165,22 +165,21 @@ defmodule PackageUrl do
 
   ## Examples
   ```elixir
-  iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
-  iex(2)> PackageUrl.to_string(purl)
+  iex> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  iex> PackageUrl.to_string(purl)
   {:ok, "pkg:maven/org.apache.commons/io@1.3.4"}
   ```
 
   ```elixir
-  iex(1)> invalid_purl = %PackageUrl{}
-  iex(2)> PackageUrl.to_string(invalid_purl)
+  iex> invalid_purl = %PackageUrl{}
+  iex> PackageUrl.to_string(invalid_purl)
   {:error, "Invalid purl: :type is a required field."}
   ```
   """
 
   def to_string(%__MODULE__{} = purl) do
-    with {:ok, sanitized} <- sanitize(purl) do
-      build_purl(sanitized)
-    else
+    case sanitize(purl) do
+      {:ok, sanitized} -> build_purl(sanitized)
       {:error, reason} -> {:error, reason}
     end
   end
@@ -192,8 +191,8 @@ defmodule PackageUrl do
 
   ## Examples
   ```elixir
-  iex(1)> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
-  iex(2)> PackageUrl.to_string!(purl)
+  iex> purl = PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
+  iex> PackageUrl.to_string!(purl)
   "pkg:maven/org.apache.commons/io@1.3.4"
   ```
   """
@@ -265,7 +264,7 @@ defmodule PackageUrl do
   defp parse_version(path) do
     case String.split(path, "@", parts: 2) do
       [remainder] -> {:ok, nil, remainder}
-      [remainder, version] -> {:ok, decodeURIComponent(version), remainder}
+      [remainder, version] -> {:ok, PackageUrl.URI.decode_uri_component(version), remainder}
     end
   end
 
@@ -275,14 +274,17 @@ defmodule PackageUrl do
         {:ok, nil, nil}
 
       [name] ->
-        {:ok, nil, decodeURIComponent(name)}
+        {:ok, nil, PackageUrl.URI.decode_uri_component(name)}
 
       ["" | namespace] ->
-        {:ok, namespace |> Enum.reverse() |> Enum.join("/") |> decodeURIComponent(), nil}
+        {:ok,
+         namespace |> Enum.reverse() |> Enum.join("/") |> PackageUrl.URI.decode_uri_component(),
+         nil}
 
       [name | namespace] ->
-        {:ok, namespace |> Enum.reverse() |> Enum.join("/") |> decodeURIComponent(),
-         decodeURIComponent(name)}
+        {:ok,
+         namespace |> Enum.reverse() |> Enum.join("/") |> PackageUrl.URI.decode_uri_component(),
+         PackageUrl.URI.decode_uri_component(name)}
     end
   end
 
@@ -339,7 +341,7 @@ defmodule PackageUrl do
     {:ok,
      [
        (namespace
-        |> encodeURIComponent()
+        |> PackageUrl.URI.encode_uri_component()
         |> String.replace("%3A", ":")
         |> String.replace("%2F", "/")) <> "/"
        | acc
@@ -350,7 +352,7 @@ defmodule PackageUrl do
     {:ok,
      [
        name
-       |> encodeURIComponent()
+       |> PackageUrl.URI.encode_uri_component()
        |> String.replace("%3A", ":")
        | acc
      ]}
@@ -364,7 +366,7 @@ defmodule PackageUrl do
        [
          "@",
          version
-         |> encodeURIComponent()
+         |> PackageUrl.URI.encode_uri_component()
          |> String.replace("%3A", ":")
        ]
        | acc
@@ -383,10 +385,10 @@ defmodule PackageUrl do
          |> Enum.sort()
          |> Enum.map(fn key ->
            {key
-            |> encodeURIComponent()
+            |> PackageUrl.URI.encode_uri_component()
             |> String.replace("%3A", ":"),
             Map.get(qualifiers, key)
-            |> encodeURI()
+            |> PackageUrl.URI.encode_uri()
             |> String.replace("%3A", ":")}
          end)
          |> Enum.map(fn {key, value} -> [key, "=", value] end)
@@ -399,7 +401,7 @@ defmodule PackageUrl do
   defp build_subpath(%__MODULE__{subpath: nil}, acc) when is_list(acc), do: {:ok, acc}
 
   defp build_subpath(%__MODULE__{subpath: subpath}, acc) when is_list(acc),
-    do: {:ok, [["#" <> encodeURI(subpath)] | acc]}
+    do: {:ok, [["#" <> PackageUrl.URI.encode_uri(subpath)] | acc]}
 
   ################################################################
   # Helper functions
@@ -415,45 +417,4 @@ defmodule PackageUrl do
     |> String.trim()
     |> String.trim_leading("/")
   end
-
-  # uriAlpha ::: one of
-  #   a b c d e f g h i j k l m n o p q r s t u v w x y z
-  #   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-  @uriAlpha 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-  # DecimalDigit :: one of
-  #   0 1 2 3 4 5 6 7 8 9
-  @decimalDigit '0123456789'
-
-  #   uriMark ::: one of
-  #   - _ . ! ~ * ' ( )
-  @uriMark '-_.!~*\'()'
-
-  # uriUnescaped :::
-  #   uriAlpha
-  #   DecimalDigit
-  #   uriMark
-  @uriUnescaped @uriAlpha ++ @decimalDigit ++ @uriMark
-
-  # uriReserved ::: one of
-  #   ; / ? : @ & = + $ ,
-  # @uriReserved ';/?:@&=+$,'
-
-  # Let reservedURISet be a String containing one instance of each character valid in uriReserved plus “#”.
-  defp decodeURI(string) when is_binary(string),
-    do: URI.decode(string)
-
-  # Let reservedURIComponentSet be the empty String.
-  defp decodeURIComponent(string) when is_binary(string),
-    do: URI.decode(string)
-
-  # Let unescapedURISet be a String containing one instance of each character valid in uriReserved and uriUnescaped plus “#”.
-  defp encodeURI(string) when is_binary(string),
-    # do: URI.encode(string, &(&1 in (@uriReserved ++ @uriUnescaped ++ '#')))
-    do: URI.encode(string)
-
-  # Let unescapedURIComponentSet be a String containing one instance of each character valid in uriUnescaped.
-  defp encodeURIComponent(string) when is_binary(string),
-    # do: URI.encode_www_form(string)
-    do: URI.encode(string, &(&1 in @uriUnescaped))
 end

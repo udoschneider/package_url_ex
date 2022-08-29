@@ -1,6 +1,4 @@
 defmodule PackageUrl.HexPackage do
-  use PackageUrl.CustomPackage
-
   @moduledoc """
   Hex packages
 
@@ -17,11 +15,12 @@ defmodule PackageUrl.HexPackage do
   ```
   """
 
+  use PackageUrl.CustomPackage
+
   @impl PackageUrl.CustomPackage
   def sanitize_namespace(namespace) when is_binary(namespace) do
-    with {:ok, namespace} <- super(namespace) do
-      {:ok, String.downcase(namespace)}
-    else
+    case super(namespace) do
+      {:ok, namespace} -> {:ok, String.downcase(namespace)}
       {:error, reason} -> {:error, reason}
     end
   end
@@ -30,9 +29,8 @@ defmodule PackageUrl.HexPackage do
 
   @impl PackageUrl.CustomPackage
   def sanitize_name(name) when is_binary(name) do
-    with {:ok, name} <- super(name) do
-      {:ok, String.downcase(name)}
-    else
+    case super(name) do
+      {:ok, name} -> {:ok, String.downcase(name)}
       {:error, reason} -> {:error, reason}
     end
   end

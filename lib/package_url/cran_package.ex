@@ -1,6 +1,4 @@
 defmodule PackageUrl.CranPackage do
-  use PackageUrl.CustomPackage
-
   @moduledoc """
   CRAN R packages
 
@@ -22,6 +20,8 @@ defmodule PackageUrl.CranPackage do
   > seems that `namespace`, `version` and `qualifiers.channel` are required
   > attributes!
   """
+
+  use PackageUrl.CustomPackage
 
   @impl PackageUrl.CustomPackage
   def sanitize_version(nil),

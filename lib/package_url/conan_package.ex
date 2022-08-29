@@ -1,6 +1,4 @@
 defmodule PackageUrl.ConanPackage do
-  use PackageUrl.CustomPackage
-
   @moduledoc """
   Conan C/C++ packages.
   The purl is designed to closely resemble the Conan-native
@@ -42,6 +40,8 @@ defmodule PackageUrl.ConanPackage do
   > Although not documented in https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conan
   > it seems that `namespace`, `version` and `qualifiers.channel` are required attributes!
   """
+
+  use PackageUrl.CustomPackage
 
   @impl PackageUrl.CustomPackage
   def sanitize_version(%{version: nil}),
