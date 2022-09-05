@@ -6,6 +6,7 @@ defmodule PackageUrl do
   import Kernel, except: [to_string: 1]
 
   alias PackageUrl.{
+    AlpmPackage,
     BitbucketPackage,
     ConanPackage,
     CranPackage,
@@ -296,6 +297,8 @@ defmodule PackageUrl do
     do: sanitize_package(%{map | type: String.downcase(type)})
 
   defp sanitize(map) when is_map(map), do: sanitize_package(map)
+
+  defp sanitize_package(%{type: "alpm"} = map), do: AlpmPackage.sanitize(map)
 
   defp sanitize_package(%{type: "bitbucket"} = map), do: BitbucketPackage.sanitize(map)
 

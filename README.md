@@ -11,6 +11,7 @@ implementation](https://raw.githubusercontent.com/package-url/packageurl-js/mast
 It also supports custom sanitization/validation as defined in
 https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst for the
 following packages:
+- `alpm`
 - `bitbucket`
 - `conan`
 - `cran`
