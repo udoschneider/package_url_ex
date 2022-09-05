@@ -2,26 +2,7 @@ defmodule PackageUrlTest do
   use ExUnit.Case
   doctest PackageUrl
 
-  test_suite_data_spec =
-    "test/fixtures/test-suite-data-spec.json"
-    |> File.read!()
-    |> Jason.decode!()
-
-  test_suite_data_jspurl =
-    "test/fixtures/test-suite-data-jspurl.json"
-    |> File.read!()
-    |> Jason.decode!()
-
-  test_suite_data =
-    (test_suite_data_spec ++ test_suite_data_jspurl)
-    |> Enum.map(fn test ->
-      {test["description"],
-       test
-       |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-       |> Enum.into(%{})}
-    end)
-    |> Enum.into(%{})
-    |> Map.values()
+  test_suite_data = PackageUrlTestHelper.parsed_test_suite_data()
 
   describe "it should not be possible to create invalid PackageUrls /" do
     for obj <- test_suite_data do

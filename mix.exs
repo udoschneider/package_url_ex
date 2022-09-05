@@ -17,7 +17,8 @@ defmodule PackageUrl.MixProject do
       source_url: "https://github.com/udoschneider/package_url_ex",
       homepage_url: "https://github.com/udoschneider/package_url_ex",
       description: description(),
-      package: package()
+      package: package(),
+      elixirc_paths: compiler_paths(Mix.env())
     ]
   end
 
@@ -53,4 +54,7 @@ defmodule PackageUrl.MixProject do
       links: %{"GitHub" => "https://github.com/udoschneider/package_url_ex"}
     ]
   end
+
+  def compiler_paths(:test), do: ["test/helpers"] ++ compiler_paths(:prod)
+  def compiler_paths(_), do: ["lib"]
 end
