@@ -4,18 +4,7 @@ defmodule PackageUrl do
              |> Enum.fetch!(1)
 
   import Kernel, except: [to_string: 1]
-
-  alias PackageUrl.{
-    AlpmPackage,
-    BitbucketPackage,
-    ConanPackage,
-    CranPackage,
-    GenericPackage,
-    GithubPackage,
-    HexPackage,
-    PypiPackage,
-    SwiftPackage
-  }
+  alias PackageUrl.Package
 
   defstruct scheme: "pkg",
             type: nil,
@@ -85,9 +74,9 @@ defmodule PackageUrl do
   {:error, "Invalid purl: :name is a required field."}
   ```
   """
-
+  @spec new(binary | maybe_improper_list | map) :: {:ok, t()} | {:error, any}
   def new(string) when is_binary(string) do
-    case parse(string) do
+    case parse_purl(string) do
       {:ok, map} -> new(map)
       {:error, reason} -> {:error, reason}
     end
@@ -149,7 +138,7 @@ defmodule PackageUrl do
   }
   ```
   """
-
+  @spec new!(binary | maybe_improper_list | map) :: t()
   def new!(purl) do
     case new(purl) do
       {:ok, purl} -> purl
@@ -176,7 +165,7 @@ defmodule PackageUrl do
   {:error, "Invalid purl: :type is a required field."}
   ```
   """
-
+  @spec to_string(t()) :: {:ok, binary} | {:error, any}
   def to_string(%__MODULE__{} = purl) do
     case sanitize(purl) do
       {:ok, sanitized} -> build_purl(sanitized)
@@ -196,7 +185,7 @@ defmodule PackageUrl do
   "pkg:maven/org.apache.commons/io@1.3.4"
   ```
   """
-
+  @spec to_string!(t()) :: binary
   def to_string!(%__MODULE__{} = purl) do
     case to_string(purl) do
       {:ok, purl} -> purl
@@ -208,7 +197,7 @@ defmodule PackageUrl do
   # Parsing functions
   ################################################################
 
-  defp parse(purl) when is_binary(purl) do
+  defp parse_purl(purl) when is_binary(purl) do
     with {:ok, scheme, remainder} <- parse_scheme(purl),
          {:ok, type, remainder} <- parse_type(remainder),
          url <- URI.parse(remainder),
@@ -292,29 +281,7 @@ defmodule PackageUrl do
   # Sanitizing functions
   ################################################################
 
-  defp sanitize(%__MODULE__{type: type} = map) when is_binary(type),
-    # We're duplicating Package behaviour/GenericPackage functions here to ensure pattern matching on `type` below
-    do: sanitize_package(%{map | type: String.downcase(type)})
-
-  defp sanitize(map) when is_map(map), do: sanitize_package(map)
-
-  defp sanitize_package(%{type: "alpm"} = map), do: AlpmPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "bitbucket"} = map), do: BitbucketPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "conan"} = map), do: ConanPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "cran"} = map), do: CranPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "github"} = map), do: GithubPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "hex"} = map), do: HexPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "pypi"} = map), do: PypiPackage.sanitize(map)
-
-  defp sanitize_package(%{type: "swift"} = map), do: SwiftPackage.sanitize(map)
-
-  defp sanitize_package(map), do: GenericPackage.sanitize(map)
+  defp sanitize(purl), do: Package.sanitize(purl)
 
   ################################################################
   # String building functions

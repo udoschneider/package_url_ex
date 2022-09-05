@@ -79,8 +79,10 @@ defmodule PackageUrl.CustomPackage do
     quote do
       @behaviour PackageUrl.CustomPackage
 
-      @doc false
-
+      @doc """
+      Sanitize `PackageUrl` according to `CustomPackage` `type`.
+      """
+      @spec sanitize(PackageUrl.t()) :: {:ok, PackageUrl.t()} | {:error, any}
       def sanitize(%PackageUrl{} = purl) do
         with {:ok, purl} <- sanitize_empty_values(purl),
              scheme <- purl.scheme,

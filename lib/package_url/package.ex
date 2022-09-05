@@ -144,4 +144,44 @@ defmodule PackageUrl.Package do
       def sanitize_aggregate(%PackageUrl{} = purl), do: {:ok, purl}
     end
   end
+
+  alias PackageUrl.{
+    AlpmPackage,
+    BitbucketPackage,
+    ConanPackage,
+    CranPackage,
+    GenericPackage,
+    GithubPackage,
+    HexPackage,
+    PypiPackage,
+    SwiftPackage
+  }
+
+  @doc """
+  Sanitize `PackageUrl` according to `CustomPackage` `type`.
+  """
+  @spec sanitize(PackageUrl.t()) :: {:ok, PackageUrl.t()} | {:error, any}
+  def sanitize(%PackageUrl{type: type} = purl) when is_binary(type),
+    # We're duplicating Package behaviour/GenericPackage functions here to ensure pattern matching on `type` below
+    do: sanitize_package(String.downcase(type), purl)
+
+  def sanitize(%PackageUrl{type: _type} = purl), do: sanitize_package(nil, purl)
+
+  defp sanitize_package("alpm", purl), do: AlpmPackage.sanitize(purl)
+
+  defp sanitize_package("bitbucket", purl), do: BitbucketPackage.sanitize(purl)
+
+  defp sanitize_package("conan", purl), do: ConanPackage.sanitize(purl)
+
+  defp sanitize_package("cran", purl), do: CranPackage.sanitize(purl)
+
+  defp sanitize_package("github", purl), do: GithubPackage.sanitize(purl)
+
+  defp sanitize_package("hex", purl), do: HexPackage.sanitize(purl)
+
+  defp sanitize_package("pypi", purl), do: PypiPackage.sanitize(purl)
+
+  defp sanitize_package("swift", purl), do: SwiftPackage.sanitize(purl)
+
+  defp sanitize_package(_, purl), do: GenericPackage.sanitize(purl)
 end
