@@ -79,6 +79,8 @@ defmodule PackageUrl.CustomPackage do
     quote do
       @behaviour PackageUrl.CustomPackage
 
+      use PackageUrl.Package
+
       @doc """
       Sanitize `PackageUrl` according to `CustomPackage` `type`.
       """
@@ -120,8 +122,6 @@ defmodule PackageUrl.CustomPackage do
 
         {:ok, struct(PackageUrl, sanitized)}
       end
-
-      use PackageUrl.Package
 
       defoverridable sanitize_type: 1,
                      sanitize_namespace: 1,

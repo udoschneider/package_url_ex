@@ -1,0 +1,50 @@
+[
+  {
+    "description": "valid swift purl 1",
+    "purl": "pkg:swift/github.com/Alamofire/Alamofire@5.4.3",
+    "canonical_purl": "pkg:swift/github.com/Alamofire/Alamofire@5.4.3",
+    "type": "swift",
+    "namespace": "github.com/Alamofire",
+    "name": "Alamofire",
+    "version": "5.4.3",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid swift purl 2",
+    "purl": "pkg:swift/github.com/RxSwiftCommunity/RxFlow@2.12.4",
+    "canonical_purl": "pkg:swift/github.com/RxSwiftCommunity/RxFlow@2.12.4",
+    "type": "swift",
+    "namespace": "github.com/RxSwiftCommunity",
+    "name": "RxFlow",
+    "version": "2.12.4",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "swift namespace is required",
+    "purl": "pkg:swift/Alamofire@5.4.3",
+    "canonical_purl": "pkg:swift/Alamofire@5.4.3",
+    "type": "swift",
+    "namespace": null,
+    "name": "Alamofire",
+    "version": "5.4.3",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": true
+  },
+  {
+    "description": "swift version is required",
+    "purl": "pkg:swift/github.com/Alamofire/Alamofire",
+    "canonical_purl": "pkg:swift/github.com/Alamofire/Alamofire",
+    "type": "swift",
+    "namespace": "github.com/Alamofire",
+    "name": "Alamofire",
+    "version": "",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": true
+  }
+]

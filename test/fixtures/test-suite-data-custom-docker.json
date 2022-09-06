@@ -1,0 +1,40 @@
+[
+  {
+    "description": "valid docker purl 1",
+    "purl": "pkg:docker/cassandra@latest",
+    "canonical_purl": "pkg:docker/cassandra@latest",
+    "type": "docker",
+    "namespace": null,
+    "name": "cassandra",
+    "version": "latest",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid docker purl 2",
+    "purl": "pkg:docker/smartentry/debian@dc437cc87d10",
+    "canonical_purl": "pkg:docker/smartentry/debian@dc437cc87d10",
+    "type": "docker",
+    "namespace": "smartentry",
+    "name": "debian",
+    "version": "dc437cc87d10",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid docker purl 3",
+    "purl": "pkg:docker/customer/dockerimage@sha256%3A244fd47e07d10?repository_url=gcr.io",
+    "canonical_purl": "pkg:docker/customer/dockerimage@sha256:244fd47e07d10?repository_url=gcr.io",
+    "type": "docker",
+    "namespace": "customer",
+    "name": "dockerimage",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "repository_url": "gcr.io"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

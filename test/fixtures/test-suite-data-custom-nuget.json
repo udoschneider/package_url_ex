@@ -1,0 +1,14 @@
+[
+  {
+    "description": "valid nuget purl 1",
+    "purl": "pkg:nuget/EnterpriseLibrary.Common@6.0.1304",
+    "canonical_purl": "pkg:nuget/EnterpriseLibrary.Common@6.0.1304",
+    "type": "nuget",
+    "namespace": null,
+    "name": "EnterpriseLibrary.Common",
+    "version": "6.0.1304",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

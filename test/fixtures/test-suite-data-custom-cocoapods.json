@@ -1,0 +1,98 @@
+[
+  {
+    "description": "valid cocoapods purl 1",
+    "purl": "pkg:cocoapods/AFNetworking@4.0.1",
+    "canonical_purl": "pkg:cocoapods/AFNetworking@4.0.1",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "AFNetworking",
+    "version": "4.0.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cocoapods purl 2",
+    "purl": "pkg:cocoapods/MapsIndoors@3.24.0",
+    "canonical_purl": "pkg:cocoapods/MapsIndoors@3.24.0",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "MapsIndoors",
+    "version": "3.24.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cocoapods purl 3",
+    "purl": "pkg:cocoapods/ShareKit@2.0#Twitter",
+    "canonical_purl": "pkg:cocoapods/ShareKit@2.0#Twitter",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "ShareKit",
+    "version": "2.0",
+    "qualifiers": null,
+    "subpath": "Twitter",
+    "is_invalid": false
+  },
+  {
+    "description": "valid cocoapods purl 4",
+    "purl": "pkg:cocoapods/GoogleUtilities@7.5.2#NSData+zlib",
+    "canonical_purl": "pkg:cocoapods/GoogleUtilities@7.5.2#NSData+zlib",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "GoogleUtilities",
+    "version": "7.5.2",
+    "qualifiers": null,
+    "subpath": "NSData+zlib",
+    "is_invalid": false
+  },
+  {
+    "description": "name is case sensitive",
+    "purl": "pkg:cocoapods/GoogleUtilities@7.5.2#NSData+zlib",
+    "canonical_purl": "pkg:cocoapods/GoogleUtilities@7.5.2#NSData+zlib",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "GoogleUtilities",
+    "version": "7.5.2",
+    "qualifiers": null,
+    "subpath": "NSData+zlib",
+    "is_invalid": false
+  },
+  {
+    "description": "name cannot contain whitespace",
+    "purl": "pkg:cocoapods/Google Utilities@7.5.2#NSData+zlib",
+    "canonical_purl": "pkg:cocoapods/Google Utilities@7.5.2#NSData+zlib",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "Google Utilities",
+    "version": "7.5.2",
+    "qualifiers": null,
+    "subpath": "NSData+zlib",
+    "is_invalid": true
+  },
+  {
+    "description": "name cannot contain a plus (+) character",
+    "purl": "pkg:cocoapods/Google+Utilities@7.5.2#NSData+zlib",
+    "canonical_purl": "pkg:cocoapods/Google+Utilities@7.5.2#NSData+zlib",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": "Google+Utilities",
+    "version": "7.5.2",
+    "qualifiers": null,
+    "subpath": "NSData+zlib",
+    "is_invalid": true
+  },
+  {
+    "description": "name cannot begin with a period `.`",
+    "purl": "pkg:cocoapods/.GoogleUtilities@7.5.2#NSData+zlib",
+    "canonical_purl": "pkg:cocoapods/.GoogleUtilities@7.5.2#NSData+zlib",
+    "type": "cocoapods",
+    "namespace": null,
+    "name": ".GoogleUtilities",
+    "version": "7.5.2",
+    "qualifiers": null,
+    "subpath": "NSData+zlib",
+    "is_invalid": true
+  }
+]

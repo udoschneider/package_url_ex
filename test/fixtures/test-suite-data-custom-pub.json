@@ -1,0 +1,50 @@
+[
+  {
+    "description": "valid pub purl 1",
+    "purl": "pkg:pub/characters@1.2.0",
+    "canonical_purl": "pkg:pub/characters@1.2.0",
+    "type": "pub",
+    "namespace": null,
+    "name": "characters",
+    "version": "1.2.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid pub purl 2",
+    "purl": "pkg:pub/flutter@0.0.0",
+    "canonical_purl": "pkg:pub/flutter@0.0.0",
+    "type": "pub",
+    "namespace": null,
+    "name": "flutter",
+    "version": "0.0.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "pub name should be lowercased",
+    "purl": "pkg:pub/fluTter@0.0.0",
+    "canonical_purl": "pkg:pub/flutter@0.0.0",
+    "type": "pub",
+    "namespace": null,
+    "name": "flutter",
+    "version": "0.0.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "pub name can only contain `[a-z0-9_]`",
+    "purl": "pkg:pub/flut-ter@0.0.0",
+    "canonical_purl": "pkg:pub/flut-ter@0.0.0",
+    "type": "pub",
+    "namespace": null,
+    "name": "flut-ter",
+    "version": "0.0.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": true
+  }
+]

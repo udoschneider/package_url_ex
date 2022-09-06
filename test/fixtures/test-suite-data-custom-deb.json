@@ -1,0 +1,88 @@
+[
+  {
+    "description": "valid deb purl 1",
+    "purl": "pkg:deb/debian/curl@7.50.3-1?arch=i386&distro=jessie",
+    "canonical_purl": "pkg:deb/debian/curl@7.50.3-1?arch=i386&distro=jessie",
+    "type": "deb",
+    "namespace": "debian",
+    "name": "curl",
+    "version": "7.50.3-1",
+    "qualifiers": {
+      "arch": "i386",
+      "distro": "jessie"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid deb purl 2",
+    "purl": "pkg:deb/debian/dpkg@1.19.0.4?arch=amd64&distro=stretch",
+    "canonical_purl": "pkg:deb/debian/dpkg@1.19.0.4?arch=amd64&distro=stretch",
+    "type": "deb",
+    "namespace": "debian",
+    "name": "dpkg",
+    "version": "1.19.0.4",
+    "qualifiers": {
+      "arch": "amd64",
+      "distro": "stretch"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid deb purl 3",
+    "purl": "pkg:deb/ubuntu/dpkg@1.19.0.4?arch=amd64",
+    "canonical_purl": "pkg:deb/ubuntu/dpkg@1.19.0.4?arch=amd64",
+    "type": "deb",
+    "namespace": "ubuntu",
+    "name": "dpkg",
+    "version": "1.19.0.4",
+    "qualifiers": {
+      "arch": "amd64"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid deb purl 4",
+    "purl": "pkg:deb/debian/attr@1:2.4.47-2?arch=source",
+    "canonical_purl": "pkg:deb/debian/attr@1:2.4.47-2?arch=source",
+    "type": "deb",
+    "namespace": "debian",
+    "name": "attr",
+    "version": "1:2.4.47-2",
+    "qualifiers": {
+      "arch": "source"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid deb purl 5",
+    "purl": "pkg:deb/debian/attr@1:2.4.47-2%2Bb1?arch=amd64",
+    "canonical_purl": "pkg:deb/debian/attr@1:2.4.47-2%2Bb1?arch=amd64",
+    "type": "deb",
+    "namespace": "debian",
+    "name": "attr",
+    "version": "1:2.4.47-2+b1",
+    "qualifiers": {
+      "arch": "amd64"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "deb namespace and name should be lowercased",
+    "purl": "pkg:deb/deBian/atTr@1:2.4.47-2%2Bb1?arch=amd64",
+    "canonical_purl": "pkg:deb/debian/attr@1:2.4.47-2%2Bb1?arch=amd64",
+    "type": "deb",
+    "namespace": "debian",
+    "name": "attr",
+    "version": "1:2.4.47-2+b1",
+    "qualifiers": {
+      "arch": "amd64"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

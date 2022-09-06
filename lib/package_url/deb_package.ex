@@ -1,14 +1,16 @@
-defmodule PackageUrl.AlpmPackage do
+defmodule PackageUrl.DebPackage do
   @moduledoc """
-  Arch Linux packages:
+  Debian, Debian derivatives, and Ubuntu packages.
 
-  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#alpm
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#deb
 
   Examples:
   ```
-  pkg:alpm/arch/pacman@6.0.1-1?arch=x86_64
-  pkg:alpm/arch/python-pip@21.0-1?arch=any
-  pkg:alpm/arch/containers-common@1:0.47.4-4?arch=x86_64
+  pkg:deb/debian/curl@7.50.3-1?arch=i386&distro=jessie
+  pkg:deb/debian/dpkg@1.19.0.4?arch=amd64&distro=stretch
+  pkg:deb/ubuntu/dpkg@1.19.0.4?arch=amd64
+  pkg:deb/debian/attr@1:2.4.47-2?arch=source
+  pkg:deb/debian/attr@1:2.4.47-2%2Bb1?arch=amd64
   ```
   """
 

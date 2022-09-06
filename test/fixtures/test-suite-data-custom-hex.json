@@ -1,0 +1,64 @@
+[
+  {
+    "description": "valid hex purl 1",
+    "purl": "pkg:hex/jason@1.1.2",
+    "canonical_purl": "pkg:hex/jason@1.1.2",
+    "type": "hex",
+    "namespace": null,
+    "name": "jason",
+    "version": "1.1.2",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid hex purl 2",
+    "purl": "pkg:hex/acme/foo@2.3.",
+    "canonical_purl": "pkg:hex/acme/foo@2.3.",
+    "type": "hex",
+    "namespace": "acme",
+    "name": "foo",
+    "version": "2.3.",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid hex purl 3",
+    "purl": "pkg:hex/phoenix_html@2.13.3#priv/static/phoenix_html.js",
+    "canonical_purl": "pkg:hex/phoenix_html@2.13.3#priv/static/phoenix_html.js",
+    "type": "hex",
+    "namespace": null,
+    "name": "phoenix_html",
+    "version": "2.13.3",
+    "qualifiers": null,
+    "subpath": "priv/static/phoenix_html.js",
+    "is_invalid": false
+  },
+  {
+    "description": "valid hex purl 4",
+    "purl": "pkg:hex/bar@1.2.3?repository_url=https://myrepo.example.com",
+    "canonical_purl": "pkg:hex/bar@1.2.3?repository_url=https://myrepo.example.com",
+    "type": "hex",
+    "namespace": null,
+    "name": "bar",
+    "version": "1.2.3",
+    "qualifiers": {
+      "repository_url": "https://myrepo.example.com"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "hex namespace and name should be lowercased",
+    "purl": "pkg:hex/aCme/fOo@2.3.",
+    "canonical_purl": "pkg:hex/acme/foo@2.3.",
+    "type": "hex",
+    "namespace": "acme",
+    "name": "foo",
+    "version": "2.3.",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

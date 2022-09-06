@@ -1,0 +1,87 @@
+[
+  {
+    "description": "valid maven purl 1",
+    "purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1",
+    "type": "maven",
+    "namespace": "org.apache.xmlgraphics",
+    "name": "batik-anim",
+    "version": "1.9.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid maven purl 2",
+    "purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?type=pom",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?type=pom",
+    "type": "maven",
+    "namespace": "org.apache.xmlgraphics",
+    "name": "batik-anim",
+    "version": "1.9.1",
+    "qualifiers": {
+      "type": "pom"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid maven purl 3",
+    "purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=sources",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=sources",
+    "type": "maven",
+    "namespace": "org.apache.xmlgraphics",
+    "name": "batik-anim",
+    "version": "1.9.1",
+    "qualifiers": {
+      "classifier": "sources"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid maven purl 4",
+    "purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?type=zip&classifier=dist",
+    "canonical_purl": "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?classifier=dist&type=zip",
+    "type": "maven",
+    "namespace": "org.apache.xmlgraphics",
+    "name": "batik-anim",
+    "version": "1.9.1",
+    "qualifiers": {
+      "classifier": "dist",
+      "type": "zip"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid maven purl 5",
+    "purl": "pkg:maven/net.sf.jacob-projec/jacob@1.14.3?classifier=x86&type=dll",
+    "canonical_purl": "pkg:maven/net.sf.jacob-projec/jacob@1.14.3?classifier=x86&type=dll",
+    "type": "maven",
+    "namespace": "net.sf.jacob-projec",
+    "name": "jacob",
+    "version": "1.14.3",
+    "qualifiers": {
+      "classifier": "x86",
+      "type": "dll"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid maven purl 6",
+    "purl": "pkg:maven/net.sf.jacob-projec/jacob@1.14.3?classifier=x64&type=dll",
+    "canonical_purl": "pkg:maven/net.sf.jacob-projec/jacob@1.14.3?classifier=x64&type=dll",
+    "type": "maven",
+    "namespace": "net.sf.jacob-projec",
+    "name": "jacob",
+    "version": "1.14.3",
+    "qualifiers": {
+      "classifier": "x64",
+      "type": "dll"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

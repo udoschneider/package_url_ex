@@ -4,7 +4,6 @@ defmodule PackageUrl do
              |> Enum.fetch!(1)
 
   import Kernel, except: [to_string: 1]
-  alias PackageUrl.Package
 
   defstruct scheme: "pkg",
             type: nil,
@@ -28,6 +27,105 @@ defmodule PackageUrl do
   Parses a PackageUrl into its components.
 
   This function accepts binaries as well as keyword lists and maps. Returns an
+  `{:ok, result}` tuple on success. Returns an `{:error, reason}` tuple if
+  parsing fails. Please note that this does not validate components and allows
+  you to parse "invalid" purls.
+
+  ## Examples
+
+  ```elixir
+  iex> PackageUrl.parse("pkg:maven/org.apache.commons/io@1.3.4")
+  {:ok,
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }}
+  iex> PackageUrl.parse("pkg:maven/@1.3.4")
+  {:ok,
+  %PackageUrl{
+    name: nil,
+    namespace: nil,
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }}
+  ```
+  """
+  @spec parse(binary | maybe_improper_list | map) :: {:ok, t()} | {:error, any}
+  def parse(purl) when is_binary(purl) do
+    case parse_purl(purl) do
+      {:ok, map} -> parse(map)
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  def parse(purl) when is_list(purl) do
+    purl
+    |> Enum.into(%{})
+    |> parse()
+  end
+
+  def parse(purl) when is_map(purl) do
+    with {:ok, merged} <- merge_defaults(purl),
+         map <- Map.from_struct(merged),
+         purl <- struct(PackageUrl, map) do
+      {:ok, purl}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Parses and validates a PackageUrl into its components.
+
+  This function accepts binaries as well as keyword lists and maps. Please note
+  that this does not validate components and allows you to parse "invalid"
+  purls.
+
+  ## Examples
+
+  ```elixir
+  iex> PackageUrl.parse!("pkg:maven/org.apache.commons/io@1.3.4")
+  %PackageUrl{
+    name: "io",
+    namespace: "org.apache.commons",
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }
+  iex> PackageUrl.parse!("pkg:maven/@1.3.4")
+  %PackageUrl{
+    name: nil,
+    namespace: nil,
+    qualifiers: nil,
+    scheme: "pkg",
+    subpath: nil,
+    type: "maven",
+    version: "1.3.4"
+  }
+  ```
+  """
+  @spec parse!(binary | maybe_improper_list | map) :: t()
+  def parse!(purl) do
+    case parse(purl) do
+      {:ok, purl} -> purl
+      {:error, reason} -> raise(ArgumentError, reason)
+    end
+  end
+
+  @doc """
+  Parses and validates a PackageUrl into its components.
+
+  This function accepts binaries as well as keyword lists and maps. Returns an
   `{:ok, result}` tuple on success. Returns an `{:error, reason}` tuple if the
   (type-specific) validation fails.
 
@@ -45,52 +143,14 @@ defmodule PackageUrl do
     type: "maven",
     version: "1.3.4"
   }}
-  iex> PackageUrl.new(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
-  {:ok,
-  %PackageUrl{
-    name: "io",
-    namespace: "org.apache.commons",
-    qualifiers: nil,
-    scheme: "pkg",
-    subpath: nil,
-    type: "maven",
-    version: "1.3.4"
-  }}
-  iex> PackageUrl.new(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
-  {:ok,
-  %PackageUrl{
-    name: "io",
-    namespace: "org.apache.commons",
-    qualifiers: nil,
-    scheme: "pkg",
-    subpath: nil,
-    type: "maven",
-    version: "1.3.4"
-  }}
-  ```
-
-  ```elixir
   iex> PackageUrl.new("pkg:maven/@1.3.4")
   {:error, "Invalid purl: :name is a required field."}
   ```
   """
   @spec new(binary | maybe_improper_list | map) :: {:ok, t()} | {:error, any}
-  def new(string) when is_binary(string) do
-    case parse_purl(string) do
-      {:ok, map} -> new(map)
-      {:error, reason} -> {:error, reason}
-    end
-  end
-
-  def new(list) when is_list(list) do
-    list
-    |> Enum.into(%{})
-    |> new()
-  end
-
-  def new(map) when is_map(map) do
-    with {:ok, merged} <- merge_defaults(map),
-         {:ok, sanitized} <- sanitize(merged) do
+  def new(purl) do
+    with {:ok, parsed} <- parse(purl),
+         {:ok, sanitized} <- sanitize(parsed) do
       {:ok, sanitized}
     else
       {:error, reason} -> {:error, reason}
@@ -98,7 +158,7 @@ defmodule PackageUrl do
   end
 
   @doc """
-  Parses a PackageUrl into its components.
+  Parses and validates a PackageUrl into its components.
 
   This function accepts binaries as well as keyword lists and maps. Raises an
   exception if the (type-specific) validation fails.
@@ -107,26 +167,6 @@ defmodule PackageUrl do
 
   ```elixir
   iex> PackageUrl.new!("pkg:maven/org.apache.commons/io@1.3.4")
-  %PackageUrl{
-    name: "io",
-    namespace: "org.apache.commons",
-    qualifiers: nil,
-    scheme: "pkg",
-    subpath: nil,
-    type: "maven",
-    version: "1.3.4"
-  }
-  iex> PackageUrl.new!(type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4")
-  %PackageUrl{
-    name: "io",
-    namespace: "org.apache.commons",
-    qualifiers: nil,
-    scheme: "pkg",
-    subpath: nil,
-    type: "maven",
-    version: "1.3.4"
-  }
-  iex> PackageUrl.new!(%{type: "maven", namespace: "org.apache.commons", name: "io", version: "1.3.4"})
   %PackageUrl{
     name: "io",
     namespace: "org.apache.commons",
@@ -281,7 +321,65 @@ defmodule PackageUrl do
   # Sanitizing functions
   ################################################################
 
-  defp sanitize(purl), do: Package.sanitize(purl)
+  @doc """
+  Sanitize `PackageUrl` according to `CustomPackage` `type`.
+  """
+  @spec sanitize(PackageUrl.t()) :: {:ok, PackageUrl.t()} | {:error, any}
+  def sanitize(%PackageUrl{type: type} = purl) when is_binary(type),
+    # We're duplicating Package behaviour/GenericPackage functions here to ensure pattern matching on `type` below
+    do: sanitize_package(String.downcase(type), purl)
+
+  def sanitize(%PackageUrl{type: _type} = purl), do: sanitize_package(nil, purl)
+
+  defp sanitize_package("alpm", purl), do: PackageUrl.AlpmPackage.sanitize(purl)
+
+  defp sanitize_package("bitbucket", purl), do: PackageUrl.BitbucketPackage.sanitize(purl)
+
+  defp sanitize_package("cocoapods", purl), do: PackageUrl.CocoapodsPackage.sanitize(purl)
+
+  defp sanitize_package("cargo", purl), do: PackageUrl.CargoPackage.sanitize(purl)
+
+  defp sanitize_package("composer", purl), do: PackageUrl.ComposerPackage.sanitize(purl)
+
+  defp sanitize_package("conan", purl), do: PackageUrl.ConanPackage.sanitize(purl)
+
+  defp sanitize_package("conda", purl), do: PackageUrl.CondaPackage.sanitize(purl)
+
+  defp sanitize_package("cran", purl), do: PackageUrl.CranPackage.sanitize(purl)
+
+  defp sanitize_package("deb", purl), do: PackageUrl.DebPackage.sanitize(purl)
+
+  defp sanitize_package("docker", purl), do: PackageUrl.DockerPackage.sanitize(purl)
+
+  defp sanitize_package("gem", purl), do: PackageUrl.GemPackage.sanitize(purl)
+
+  defp sanitize_package("github", purl), do: PackageUrl.GithubPackage.sanitize(purl)
+
+  defp sanitize_package("golang", purl), do: PackageUrl.GolangPackage.sanitize(purl)
+
+  defp sanitize_package("hackage", purl), do: PackageUrl.HackagePackage.sanitize(purl)
+
+  defp sanitize_package("hex", purl), do: PackageUrl.HexPackage.sanitize(purl)
+
+  defp sanitize_package("maven", purl), do: PackageUrl.MavenPackage.sanitize(purl)
+
+  defp sanitize_package("npm", purl), do: PackageUrl.NpmPackage.sanitize(purl)
+
+  defp sanitize_package("nuget", purl), do: PackageUrl.NugetPackage.sanitize(purl)
+
+  defp sanitize_package("oci", purl), do: PackageUrl.OciPackage.sanitize(purl)
+
+  defp sanitize_package("pub", purl), do: PackageUrl.PubPackage.sanitize(purl)
+
+  defp sanitize_package("rpm", purl), do: PackageUrl.RpmPackage.sanitize(purl)
+
+  defp sanitize_package("pypi", purl), do: PackageUrl.PypiPackage.sanitize(purl)
+
+  defp sanitize_package("swid", purl), do: PackageUrl.SwidPackage.sanitize(purl)
+
+  defp sanitize_package("swift", purl), do: PackageUrl.SwiftPackage.sanitize(purl)
+
+  defp sanitize_package(_, purl), do: PackageUrl.GenericPackage.sanitize(purl)
 
   ################################################################
   # String building functions

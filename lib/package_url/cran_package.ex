@@ -15,8 +15,7 @@ defmodule PackageUrl.CranPackage do
   >
   > Although not documented in
   > https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#cran it
-  > seems that `namespace`, `version` and `qualifiers.channel` are required
-  > attributes!
+  > seems that `version` is a requiredattributes!
   """
 
   use PackageUrl.CustomPackage

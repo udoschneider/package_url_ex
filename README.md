@@ -13,11 +13,27 @@ https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst for the
 following packages:
 - `alpm`
 - `bitbucket`
+- `cargo`
+- `cocoapods`
+- `composer`
 - `conan`
+- `conda`
 - `cran`
+- `deb`
+- `docker`
+- `gem`
+- `generic`
 - `github`
+- `golang`
+- `hackage`
 - `hex`
+- `maven`
+- `npm`
+- `nuget`
+- `oci`
+- `pub`
 - `pypi`
+- `swid`
 - `swift`
 
 ## Installation

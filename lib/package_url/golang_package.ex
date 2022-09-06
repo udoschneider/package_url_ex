@@ -1,14 +1,14 @@
-defmodule PackageUrl.AlpmPackage do
+defmodule PackageUrl.GolangPackage do
   @moduledoc """
-  Arch Linux packages:
+  Go packages
 
-  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#alpm
+  See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#golang
 
   Examples:
   ```
-  pkg:alpm/arch/pacman@6.0.1-1?arch=x86_64
-  pkg:alpm/arch/python-pip@21.0-1?arch=any
-  pkg:alpm/arch/containers-common@1:0.47.4-4?arch=x86_64
+  pkg:golang/github.com/gorilla/context@234fd47e07d1004f0aed9c
+  pkg:golang/google.golang.org/genproto#googleapis/api/annotations
+  pkg:golang/github.com/gorilla/context@234fd47e07d1004f0aed9c#api
   ```
   """
 

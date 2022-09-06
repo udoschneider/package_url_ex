@@ -1,0 +1,38 @@
+[
+  {
+    "description": "valid cran purl 1",
+    "purl": "pkg:cran/A3@1.0.0",
+    "canonical_purl": "pkg:cran/A3@1.0.0",
+    "type": "cran",
+    "namespace": null,
+    "name": "A3",
+    "version": "1.0.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cran purl 2",
+    "purl": "pkg:cran/rJava@1.0-4",
+    "canonical_purl": "pkg:cran/rJava@1.0-4",
+    "type": "cran",
+    "namespace": null,
+    "name": "rJava",
+    "version": "1.0-4",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cran purl 3",
+    "purl": "pkg:cran/caret@6.0-88",
+    "canonical_purl": "pkg:cran/caret@6.0-88",
+    "type": "cran",
+    "namespace": null,
+    "name": "caret",
+    "version": "6.0-88",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

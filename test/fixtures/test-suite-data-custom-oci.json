@@ -1,0 +1,77 @@
+[
+  {
+    "description": "valid oci purl 1",
+    "purl": "pkg:oci/debian@sha256%3A244fd47e07d10?repository_url=docker.io/library/debian&arch=amd64&tag=latest",
+    "canonical_purl": "pkg:oci/debian@sha256:244fd47e07d10?arch=amd64&repository_url=docker.io/library/debian&tag=latest",
+    "type": "oci",
+    "namespace": null,
+    "name": "debian",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "arch": "amd64",
+      "repository_url": "docker.io/library/debian",
+      "tag": "latest"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid oci purl 2",
+    "purl": "pkg:oci/debian@sha256%3A244fd47e07d10?repository_url=ghcr.io/debian&tag=bullseye",
+    "canonical_purl": "pkg:oci/debian@sha256:244fd47e07d10?repository_url=ghcr.io/debian&tag=bullseye",
+    "type": "oci",
+    "namespace": null,
+    "name": "debian",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "repository_url": "ghcr.io/debian",
+      "tag": "bullseye"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid oci purl 3",
+    "purl": "pkg:oci/static@sha256%3A244fd47e07d10?repository_url=gcr.io/distroless/static&tag=latest",
+    "canonical_purl": "pkg:oci/static@sha256:244fd47e07d10?repository_url=gcr.io/distroless/static&tag=latest",
+    "type": "oci",
+    "namespace": null,
+    "name": "static",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "repository_url": "gcr.io/distroless/static",
+      "tag": "latest"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid oci purl 4",
+    "purl": "pkg:oci/hello-wasm@sha256%3A244fd47e07d10?tag=v1",
+    "canonical_purl": "pkg:oci/hello-wasm@sha256:244fd47e07d10?tag=v1",
+    "type": "oci",
+    "namespace": null,
+    "name": "hello-wasm",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "tag": "v1"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "oci name should be lowercased",
+    "purl": "pkg:oci/stAtic@sha256%3A244fd47e07d10?repository_url=gcr.io/distroless/stAtic&tag=latest",
+    "canonical_purl": "pkg:oci/static@sha256:244fd47e07d10?repository_url=gcr.io/distroless/static&tag=latest",
+    "type": "oci",
+    "namespace": null,
+    "name": "static",
+    "version": "sha256:244fd47e07d10",
+    "qualifiers": {
+      "repository_url": "gcr.io/distroless/static",
+      "tag": "latest"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

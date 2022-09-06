@@ -1,0 +1,28 @@
+[
+  {
+    "description": "valid gem purl 1",
+    "purl": "pkg:gem/ruby-advisory-db-check@0.12.4",
+    "canonical_purl": "pkg:gem/ruby-advisory-db-check@0.12.4",
+    "type": "gem",
+    "namespace": null,
+    "name": "ruby-advisory-db-check",
+    "version": "0.12.4",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid gem purl 2",
+    "purl": "pkg:gem/jruby-launcher@1.1.2?platform=java",
+    "canonical_purl": "pkg:gem/jruby-launcher@1.1.2?platform=java",
+    "type": "gem",
+    "namespace": null,
+    "name": "jruby-launcher",
+    "version": "1.1.2",
+    "qualifiers": {
+      "platform": "java"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "description": "valid npm purl 1",
+    "purl": "pkg:npm/foobar@12.3.1",
+    "canonical_purl": "pkg:npm/foobar@12.3.1",
+    "type": "npm",
+    "namespace": null,
+    "name": "foobar",
+    "version": "12.3.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid npm purl 2",
+    "purl": "pkg:npm/%40angular/animation@12.3.1",
+    "canonical_purl": "pkg:npm/%40angular/animation@12.3.1",
+    "type": "npm",
+    "namespace": "@angular",
+    "name": "animation",
+    "version": "12.3.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid npm purl 3",
+    "purl": "pkg:npm/mypackage@12.4.5?vcs_url=git://host.com/path/to/repo.git%404345abcd34343",
+    "canonical_purl": "pkg:npm/mypackage@12.4.5?vcs_url=git://host.com/path/to/repo.git@4345abcd34343",
+    "type": "npm",
+    "namespace": null,
+    "name": "mypackage",
+    "version": "12.4.5",
+    "qualifiers": {
+      "vcs_url": "git://host.com/path/to/repo.git@4345abcd34343"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

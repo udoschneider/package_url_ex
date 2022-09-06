@@ -1,0 +1,38 @@
+[
+  {
+    "description": "hackage cran purl 1",
+    "purl": "pkg:hackage/a50@0.5",
+    "canonical_purl": "pkg:hackage/a50@0.5",
+    "type": "hackage",
+    "namespace": null,
+    "name": "a50",
+    "version": "0.5",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "hackage cran purl 2",
+    "purl": "pkg:hackage/AC-HalfInteger@1.2.1",
+    "canonical_purl": "pkg:hackage/AC-HalfInteger@1.2.1",
+    "type": "hackage",
+    "namespace": null,
+    "name": "AC-HalfInteger",
+    "version": "1.2.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "hackage cran purl 3",
+    "purl": "pkg:hackage/3d-graphics-examples@0.0.0.2",
+    "canonical_purl": "pkg:hackage/3d-graphics-examples@0.0.0.2",
+    "type": "hackage",
+    "namespace": null,
+    "name": "3d-graphics-examples",
+    "version": "0.0.0.2",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

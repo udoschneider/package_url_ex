@@ -1,0 +1,38 @@
+[
+  {
+    "description": "valid cargo purl 1",
+    "purl": "pkg:cargo/rand@0.7.2",
+    "canonical_purl": "pkg:cargo/rand@0.7.2",
+    "type": "cargo",
+    "namespace": null,
+    "name": "rand",
+    "version": "0.7.2",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cargo purl 2",
+    "purl": "pkg:cargo/clap@2.33.0",
+    "canonical_purl": "pkg:cargo/clap@2.33.0",
+    "type": "cargo",
+    "namespace": null,
+    "name": "clap",
+    "version": "2.33.0",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid cargo purl 3",
+    "purl": "pkg:cargo/structopt@0.3.11",
+    "canonical_purl": "pkg:cargo/structopt@0.3.11",
+    "type": "cargo",
+    "namespace": null,
+    "name": "structopt",
+    "version": "0.3.11",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

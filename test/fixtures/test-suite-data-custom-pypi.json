@@ -1,0 +1,50 @@
+[
+  {
+    "description": "valid pypi purl 1",
+    "purl": "pkg:pypi/django@1.11.1",
+    "canonical_purl": "pkg:pypi/django@1.11.1",
+    "type": "pypi",
+    "namespace": null,
+    "name": "django",
+    "version": "1.11.1",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid pypi purl 2",
+    "purl": "pkg:pypi/django-allauth@12.23",
+    "canonical_purl": "pkg:pypi/django-allauth@12.23",
+    "type": "pypi",
+    "namespace": null,
+    "name": "django-allauth",
+    "version": "12.23",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "pypi name should be lowercased",
+    "purl": "pkg:pypi/django-Allauth@12.23",
+    "canonical_purl": "pkg:pypi/django-allauth@12.23",
+    "type": "pypi",
+    "namespace": null,
+    "name": "django-allauth",
+    "version": "12.23",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "pypi name replaces `_` with `-`",
+    "purl": "pkg:pypi/django_allauth@12.23",
+    "canonical_purl": "pkg:pypi/django-allauth@12.23",
+    "type": "pypi",
+    "namespace": null,
+    "name": "django-allauth",
+    "version": "12.23",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

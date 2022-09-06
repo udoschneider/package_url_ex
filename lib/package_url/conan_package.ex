@@ -8,13 +8,15 @@ defmodule PackageUrl.ConanPackage do
   ```
   pkg:conan/openssl@3.0.3
   pkg:conan/openssl.org/openssl@3.0.3?user=bincrafters&channel=stable
-  pkg:conan/openssl.org/openssl@3.0.3?arch=x86_64&build_type=Debug&compiler=Visual%20Studio&compiler.runtime=MDd&compiler.version=16&os=Win
+  pkg:conan/openssl.org/openssl@3.0.3?arch=x86_64&build_type=Debug&compiler=Visual%20Studio&compiler.runtime=MDd&compiler.version=16&os=Windows&shared=True&rrev=93a82349c31917d2d674d22065c7a9ef9f380c8e&prev=b429db8a0e324114c25ec387bfd8281f330d7c5c
   ```
 
   > #### Note {: .neutral}
   >
-  > Although not documented in https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conan
-  > it seems that `namespace`, `version` and `qualifiers.channel` are required attributes!
+  > Although not documented in
+  > https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#conan it
+  > seems that `version`is a required attribute! Also if `namespace` is present
+  > `qualifiers.channel` is required and vice versa!
   """
 
   use PackageUrl.CustomPackage

@@ -1,0 +1,48 @@
+[
+  {
+    "description": "valid rpm purl 1",
+    "purl": "pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25",
+    "canonical_purl": "pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25",
+    "type": "rpm",
+    "namespace": "fedora",
+    "name": "curl",
+    "version": "7.50.3-1.fc25",
+    "qualifiers": {
+      "arch": "i386",
+      "distro": "fedora-25"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid rpm purl 2",
+    "purl": "pkg:rpm/centerim@4.22.10-1.el6?arch=i686&epoch=1&distro=fedora-25",
+    "canonical_purl": "pkg:rpm/centerim@4.22.10-1.el6?arch=i686&distro=fedora-25&epoch=1",
+    "type": "rpm",
+    "namespace": null,
+    "name": "centerim",
+    "version": "4.22.10-1.el6",
+    "qualifiers": {
+      "arch": "i686",
+      "epoch": "1",
+      "distro": "fedora-25"
+    },
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "rpm namespace should be lowercased",
+    "purl": "pkg:rpm/Fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25",
+    "canonical_purl": "pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25",
+    "type": "rpm",
+    "namespace": "fedora",
+    "name": "curl",
+    "version": "7.50.3-1.fc25",
+    "qualifiers": {
+      "arch": "i386",
+      "distro": "fedora-25"
+    },
+    "subpath": null,
+    "is_invalid": false
+  }
+]

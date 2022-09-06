@@ -1,0 +1,38 @@
+[
+  {
+    "description": "valid github purl 1",
+    "purl": "pkg:github/package-url/purl-spec@244fd47e07d1004",
+    "canonical_purl": "pkg:github/package-url/purl-spec@244fd47e07d1004",
+    "type": "github",
+    "namespace": "package-url",
+    "name": "purl-spec",
+    "version": "244fd47e07d1004",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  },
+  {
+    "description": "valid github purl 2",
+    "purl": "pkg:github/package-url/purl-spec@244fd47e07d1004#everybody/loves/dogs",
+    "canonical_purl": "pkg:github/package-url/purl-spec@244fd47e07d1004#everybody/loves/dogs",
+    "type": "github",
+    "namespace": "package-url",
+    "name": "purl-spec",
+    "version": "244fd47e07d1004",
+    "qualifiers": null,
+    "subpath": "everybody/loves/dogs",
+    "is_invalid": false
+  },
+  {
+    "description": "git namespace and name should be lowercased",
+    "purl": "pkg:github/pacKage-url/pUrl-spec@244fd47e07d1004",
+    "canonical_purl": "pkg:github/package-url/purl-spec@244fd47e07d1004",
+    "type": "github",
+    "namespace": "package-url",
+    "name": "purl-spec",
+    "version": "244fd47e07d1004",
+    "qualifiers": null,
+    "subpath": null,
+    "is_invalid": false
+  }
+]

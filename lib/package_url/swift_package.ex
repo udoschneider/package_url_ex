@@ -4,11 +4,11 @@ defmodule PackageUrl.SwiftPackage do
 
   See https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#swift
 
-  > #### Note {: .neutral}
-  >
-  > Although not documented in
-  > https://github.com/package-url/purl-spec/blob/master/PURL-TYPES.rst#swift it
-  > seems that `namespace` and `version` are required attributes!
+  Examples:
+  ```
+  pkg:swift/github.com/Alamofire/Alamofire@5.4.3
+  pkg:swift/github.com/RxSwiftCommunity/RxFlow@2.12.4
+  ```
   """
 
   use PackageUrl.CustomPackage
